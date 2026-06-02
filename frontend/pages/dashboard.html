@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard | Smart Interview Tracker</title>
+
+    <link rel="stylesheet" href="../css/dashboard.css" />
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    />
+  </head>
+  <body>
+    <nav class="navbar">
+      <div class="logo">
+        <i class="fa-solid fa-briefcase"></i>
+        <span>InterviewTracker</span>
+      </div>
+
+      <button class="menu-btn" id="menuBtn">☰</button>
+
+      <ul class="nav-links">
+        <li><a href="dashboard.html">Dashboard</a></li>
+        <li><a href="applications.html">Applications</a></li>
+        <li><a href="profile.html">Profile</a></li>
+        <li><a href="../index.html">Logout</a></li>
+      </ul>
+    </nav>
+
+    <div class="container">
+      <h1 class="welcome">Welcome Back, Jayant 👋</h1>
+
+      <!-- Stats -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <h3>Total Applications</h3>
+          <p>0</p>
+        </div>
+
+        <div class="stat-card">
+          <h3>Interviews</h3>
+          <p>0</p>
+        </div>
+
+        <div class="stat-card">
+          <h3>Offers</h3>
+          <p>0</p>
+        </div>
+
+        <div class="stat-card">
+          <h3>Rejections</h3>
+          <p>0</p>
+        </div>
+      </div>
+
+      <!-- Resume -->
+      <div class="card">
+        <h2>Resume Management</h2>
+
+        <div class="info">
+          <p><strong>Active Resume:</strong> No Resume Uploaded</p>
+          <p><strong>ATS Score:</strong> Not Available</p>
+          <p><strong>Last Updated:</strong> --</p>
+          <p><strong>Total Resumes:</strong> 0</p>
+        </div>
+      </div>
+
+      <!-- Recent Applications -->
+      <div class="card">
+        <h2>Recent Applications</h2>
+        <div class="empty">No applications added yet.</div>
+      </div>
+
+      <!-- Upcoming Interviews -->
+      <div class="card">
+        <h2>Upcoming Interviews</h2>
+        <div class="empty">No interviews scheduled yet.</div>
+      </div>
+
+      <!-- Interview Analysis -->
+      <div class="card">
+        <h2>Interview Questions Analysis</h2>
+        <div class="empty">No interview data available.</div>
+      </div>
+
+      <!-- Recently Asked Questions -->
+      <div class="card">
+        <h2>Recently Asked Questions</h2>
+        <div class="empty">No questions recorded yet.</div>
+      </div>
+
+      <!-- Resume Analytics -->
+      <div class="card">
+        <h2>Resume Usage Analytics</h2>
+        <div class="empty">Upload resumes to view analytics.</div>
+      </div>
+
+      <!-- Difficulty -->
+      <div class="card">
+        <h2>Difficulty Breakdown</h2>
+
+        <div class="difficulty">
+          <span>Easy : 0</span>
+          <span>Medium : 0</span>
+          <span>Hard : 0</span>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="card">
+        <h2>Quick Actions</h2>
+
+        <div class="actions">
+          <button>+ Add Application</button>
+          <button>+ Schedule Interview</button>
+          <button>+ Add Questions Asked</button>
+          <button>+ Upload Resume</button>
+          <button>+ Switch Resume</button>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

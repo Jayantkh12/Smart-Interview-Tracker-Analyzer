@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Profile | Smart Interview Tracker</title>
+
+    <link rel="stylesheet" href="../css/profile.css" />
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    />
+  </head>
+
+  <body>
+    <nav class="navbar">
+      <div class="logo">
+        <i class="fa-solid fa-briefcase"></i>
+        <span>InterviewTracker</span>
+      </div>
+
+      <button class="menu-btn" id="menuBtn">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+
+      <ul class="nav-links" id="navLinks">
+        <li><a href="dashboard.html">Dashboard</a></li>
+        <li><a href="applications.html">Applications</a></li>
+        <li><a href="profile.html" class="active">Profile</a></li>
+        <li><a href="../index.html">Logout</a></li>
+      </ul>
+    </nav>
+
+    <div class="profile-container">
+      <h1><i class="fa-solid fa-user-plus"></i> Complete Your Profile</h1>
+
+      <p class="profile-subtitle" id="newUserMessage">
+        You are a new user. Please complete your profile first.
+      </p>
+
+      <div class="profile-card">
+        <div class="profile-image">
+          <img
+            src="https://cdn-icons-png.flaticon.com/512/847/847969.png"
+            alt="Profile Picture"
+            id="profilePreview"
+          />
+
+          <label for="photoUpload" class="upload-btn">
+            <i class="fa-solid fa-camera"></i>
+            Upload Photo
+          </label>
+
+          <input type="file" id="photoUpload" accept="image/*" hidden />
+        </div>
+
+        <form class="profile-info" id="profileForm">
+          <div class="input-group">
+            <label>
+              <i class="fa-solid fa-user"></i>
+              Full Name
+            </label>
+            <input
+              type="text"
+              id="fullName"
+              placeholder="Enter your full name"
+              required
+            />
+          </div>
+
+          <div class="input-group">
+            <label>
+              <i class="fa-solid fa-envelope"></i>
+              Email Address
+            </label>
+            <input
+              type="email"
+              id="email"
+              placeholder="Enter your email address"
+              required
+            />
+          </div>
+
+          <div class="input-group">
+            <label>
+              <i class="fa-solid fa-phone"></i>
+              Phone Number
+            </label>
+            <input
+              type="tel"
+              id="phone"
+              placeholder="Enter your phone number"
+            />
+          </div>
+
+          <div class="input-group">
+            <label>
+              <i class="fa-solid fa-building-columns"></i>
+              College / University
+            </label>
+            <input
+              type="text"
+              id="college"
+              placeholder="Enter your college name"
+            />
+          </div>
+
+          <div class="input-group">
+            <label>
+              <i class="fa-solid fa-code"></i>
+              Branch / Department
+            </label>
+            <input type="text" id="branch" placeholder="e.g. CSE, IT, ECE" />
+          </div>
+
+          <div class="input-group">
+            <label>
+              <i class="fa-solid fa-graduation-cap"></i>
+              Graduation Year
+            </label>
+            <select id="graduationYear">
+              <option value="" selected disabled>Select Year</option>
+              <option>2026</option>
+              <option>2027</option>
+              <option>2028</option>
+              <option>2029</option>
+              <option>2030</option>
+            </select>
+          </div>
+        </form>
+      </div>
+
+      <div class="stats-container">
+        <div class="stat-card">
+          <h2>0</h2>
+          <p>Applications</p>
+        </div>
+
+        <div class="stat-card">
+          <h2>0</h2>
+          <p>Interviews</p>
+        </div>
+
+        <div class="stat-card">
+          <h2>0</h2>
+          <p>Offers</p>
+        </div>
+
+        <div class="stat-card">
+          <h2>0</h2>
+          <p>Rejected</p>
+        </div>
+      </div>
+
+      <div class="section-card">
+        <h2><i class="fa-solid fa-file-lines"></i> Resume</h2>
+
+        <div class="resume-box">
+          <span id="resumeStatus">
+            <i class="fa-solid fa-circle-info"></i>
+            No resume uploaded yet
+          </span>
+
+          <div class="resume-actions">
+            <button class="view-btn" id="viewResumeBtn" type="button" disabled>
+              <i class="fa-solid fa-eye"></i>
+              View
+            </button>
+
+            <label for="resumeUpload" class="update-btn">
+              <i class="fa-solid fa-upload"></i>
+              Upload Resume
+            </label>
+
+            <input
+              type="file"
+              id="resumeUpload"
+              accept=".pdf,.doc,.docx"
+              hidden
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="section-card">
+        <h2><i class="fa-solid fa-laptop-code"></i> Skills</h2>
+
+        <p class="empty-message" id="noSkillsMessage">No skills added yet</p>
+
+        <div class="skills" id="skillsList"></div>
+
+        <div class="add-skill-box">
+          <input
+            type="text"
+            id="skillInput"
+            placeholder="Add a skill e.g. JavaScript"
+          />
+
+          <button type="button" id="addSkillBtn">
+            <i class="fa-solid fa-plus"></i>
+            Add Skill
+          </button>
+        </div>
+      </div>
+
+      <div class="section-card">
+        <h2><i class="fa-solid fa-bullseye"></i> Career Preferences</h2>
+
+        <div class="profile-info">
+          <div class="input-group">
+            <label>
+              <i class="fa-solid fa-laptop-code"></i>
+              Preferred Role
+            </label>
+            <input
+              type="text"
+              id="preferredRole"
+              placeholder="Software Engineer, Data Analyst..."
+            />
+          </div>
+
+          <div class="input-group">
+            <label>
+              <i class="fa-solid fa-indian-rupee-sign"></i>
+              Expected Package
+            </label>
+            <input
+              type="text"
+              id="expectedPackage"
+              placeholder="e.g. 6 LPA, 10 LPA"
+            />
+          </div>
+
+          <div class="input-group">
+            <label>
+              <i class="fa-solid fa-location-dot"></i>
+              Preferred Location
+            </label>
+            <input
+              type="text"
+              id="preferredLocation"
+              placeholder="Delhi, Bangalore, Remote..."
+            />
+          </div>
+
+          <div class="input-group">
+            <label>
+              <i class="fa-solid fa-briefcase"></i>
+              Work Type
+            </label>
+            <select id="workType">
+              <option value="" selected disabled>Select Work Type</option>
+              <option>Remote</option>
+              <option>On-site</option>
+              <option>Hybrid</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-card">
+        <h2><i class="fa-solid fa-gear"></i> Account Settings</h2>
+
+        <div class="settings-buttons">
+          <button class="change-btn" type="button">
+            <i class="fa-solid fa-key"></i>
+            Change Password
+          </button>
+
+          <button class="delete-btn" type="button">
+            <i class="fa-solid fa-trash"></i>
+            Delete Account
+          </button>
+        </div>
+      </div>
+
+      <button class="save-btn" id="saveProfile" type="button">
+        <i class="fa-solid fa-floppy-disk"></i>
+        Save Profile
+      </button>
+    </div>
+
+    <script src="../js/profile.js"></script>
+  </body>
+</html>

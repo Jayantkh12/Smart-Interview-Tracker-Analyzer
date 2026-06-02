@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Applications | Smart Interview Tracker</title>
+
+    <link rel="stylesheet" href="../css/applications.css" />
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    />
+  </head>
+
+  <nav class="navbar">
+      <div class="logo">
+        <i class="fa-solid fa-briefcase"></i>
+        <span>InterviewTracker</span>
+      </div>
+
+      <button class="menu-btn" id="menuBtn">☰</button>
+
+      <ul class="nav-links">
+        <li><a href="dashboard.html">Dashboard</a></li>
+        <li><a href="applications.html">Applications</a></li>
+        <li><a href="profile.html">Profile</a></li>
+        <li><a href="../index.html">Logout</a></li>
+      </ul>
+    </nav>
+
+    <!-- Main -->
+
+    <div class="container">
+      <h1>📋 Applications</h1>
+
+      <!-- Stats -->
+
+      <div class="stats">
+        <div class="stat-card">
+          <h3>Total Apps</h3>
+          <p>0</p>
+        </div>
+
+        <div class="stat-card">
+          <h3>Applied</h3>
+          <p>0</p>
+        </div>
+
+        <div class="stat-card">
+          <h3>Interviews</h3>
+          <p>0</p>
+        </div>
+
+        <div class="stat-card">
+          <h3>Offers</h3>
+          <p>0</p>
+        </div>
+
+        <div class="stat-card">
+          <h3>Rejected</h3>
+          <p>0</p>
+        </div>
+      </div>
+
+      <!-- Search -->
+
+      <div class="search-box">
+        <input type="text" placeholder="Search Company / Role" />
+      </div>
+
+      <!-- Applications Table -->
+
+      <div class="table-container">
+        <h2>Your Applications</h2>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Company</th>
+              <th>Role</th>
+              <th>Expected Package</th>
+              <th>Status</th>
+              <th>Applied Update</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr>
+              <td colspan="6" class="empty-row">No Applications Yet</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Add Application -->
+
+      <div class="form-box">
+        <h2>Add New Application</h2>
+
+        <form>
+          <div class="input-group">
+            <label>Company Name</label>
+            <input type="text" placeholder="Enter company name" />
+          </div>
+
+          <div class="input-group">
+            <label>Job Role</label>
+            <input type="text" placeholder="Enter role" />
+          </div>
+
+          <div class="input-group">
+            <label>Package (LPA)</label>
+            <input type="number" placeholder="Expected package" />
+          </div>
+
+          <div class="input-group">
+            <label>Application Link</label>
+            <input type="url" placeholder="Paste application link" />
+          </div>
+
+          <div class="input-group full-width resume-upload">
+            <label for="resume">Resume</label>
+
+            <div class="resume-box">
+              <input type="file" id="resume" accept=".pdf,.doc,.docx" hidden />
+
+              <button type="button" id="uploadBtn">
+                <i class="fa-solid fa-upload"></i>
+                Choose File
+              </button>
+
+              <span id="fileName">No file selected</span>
+
+              <button type="button" id="previewBtn" disabled>
+                <i class="fa-solid fa-eye"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="input-group full-width">
+            <label>Notes</label>
+            <textarea rows="5" placeholder="Write notes here..."></textarea>
+          </div>
+
+          <button type="submit">Save Application</button>
+        </form>
+      </div>
+    </div>
+  </body>
+  <script>
+    const fileInput = document.getElementById("resume");
+    const uploadBtn = document.getElementById("uploadBtn");
+    const previewBtn = document.getElementById("previewBtn");
+    const fileName = document.getElementById("fileName");
+
+    let uploadedFile = null;
+
+    uploadBtn.addEventListener("click", () => {
+      fileInput.click();
+    });
+
+    fileInput.addEventListener("change", () => {
+      uploadedFile = fileInput.files[0];
+
+      if (uploadedFile) {
+        fileName.textContent = uploadedFile.name;
+        previewBtn.disabled = false;
+      }
+    });
+
+    previewBtn.addEventListener("click", () => {
+      if (!uploadedFile) {
+        alert("Please select a file first!");
+        return;
+      }
+
+      const fileURL = URL.createObjectURL(uploadedFile);
+      window.open(fileURL, "_blank");
+    });
+  </script>
+</html>
