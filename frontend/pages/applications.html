@@ -3,76 +3,74 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
     <title>Applications | Smart Interview Tracker</title>
 
     <link rel="stylesheet" href="../css/applications.css" />
-
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
     />
   </head>
 
-  <nav class="navbar">
+  <body>
+    <nav class="navbar">
       <div class="logo">
         <i class="fa-solid fa-briefcase"></i>
         <span>InterviewTracker</span>
       </div>
 
-      <button class="menu-btn" id="menuBtn">☰</button>
+      <button class="menu-btn" id="menuBtn" aria-label="Open navigation">
+        <i class="fa-solid fa-bars"></i>
+      </button>
 
       <ul class="nav-links">
         <li><a href="dashboard.html">Dashboard</a></li>
-        <li><a href="applications.html">Applications</a></li>
+        <li><a href="applications.html" class="active">Applications</a></li>
+        <li><a href="analytics.html">Analytics</a></li>
         <li><a href="profile.html">Profile</a></li>
         <li><a href="../index.html">Logout</a></li>
       </ul>
     </nav>
 
-    <!-- Main -->
+    <main class="container">
+      <h1><i class="fa-solid fa-list-check"></i> Applications</h1>
 
-    <div class="container">
-      <h1>📋 Applications</h1>
-
-      <!-- Stats -->
-
-      <div class="stats">
+      <section class="stats" aria-label="Application statistics">
         <div class="stat-card">
           <h3>Total Apps</h3>
-          <p>0</p>
+          <p id="totalApps">0</p>
         </div>
 
         <div class="stat-card">
           <h3>Applied</h3>
-          <p>0</p>
+          <p id="appliedApps">0</p>
         </div>
 
         <div class="stat-card">
           <h3>Interviews</h3>
-          <p>0</p>
+          <p id="interviewApps">0</p>
         </div>
 
         <div class="stat-card">
           <h3>Offers</h3>
-          <p>0</p>
+          <p id="offerApps">0</p>
         </div>
 
         <div class="stat-card">
           <h3>Rejected</h3>
-          <p>0</p>
+          <p id="rejectedApps">0</p>
         </div>
-      </div>
-
-      <!-- Search -->
+      </section>
 
       <div class="search-box">
-        <input type="text" placeholder="Search Company / Role" />
+        <input
+          id="searchInput"
+          type="text"
+          placeholder="Search Company / Role"
+        />
       </div>
 
-      <!-- Applications Table -->
-
-      <div class="table-container">
+      <section class="table-container">
         <h2>Your Applications</h2>
 
         <table>
@@ -81,44 +79,67 @@
               <th>Company</th>
               <th>Role</th>
               <th>Expected Package</th>
-              <th>Status</th>
+              <th>
+                <select id="selectFilter" aria-label="Filter by status">
+                  <option value="All">All</option>
+                  <option value="Applied">Applied</option>
+                  <option value="Interview">Interview</option>
+                  <option value="Offer">Offer</option>
+                  <option value="Rejected">Rejected</option>
+                </select>
+              </th>
               <th>Applied Update</th>
               <th>Actions</th>
             </tr>
           </thead>
 
-          <tbody>
+          <tbody id="applicationsBody">
             <tr>
-              <td colspan="6" class="empty-row">No Applications Yet</td>
+              <td colspan="6" class="empty-row">Loading applications...</td>
             </tr>
           </tbody>
         </table>
-      </div>
+      </section>
 
-      <!-- Add Application -->
-
-      <div class="form-box">
+      <section class="form-box">
         <h2>Add New Application</h2>
 
-        <form>
+        <form id="applicationForm">
           <div class="input-group">
-            <label>Company Name</label>
-            <input type="text" placeholder="Enter company name" />
+            <label for="companyname">Company Name</label>
+            <input
+              id="companyname"
+              type="text"
+              placeholder="Enter company name"
+              required
+            />
           </div>
 
           <div class="input-group">
-            <label>Job Role</label>
-            <input type="text" placeholder="Enter role" />
+            <label for="jobrole">Job Role</label>
+            <input id="jobrole" type="text" placeholder="Enter role" required />
           </div>
 
           <div class="input-group">
-            <label>Package (LPA)</label>
-            <input type="number" placeholder="Expected package" />
+            <label for="package">Package (LPA)</label>
+            <input
+              id="package"
+              type="number"
+              min="0"
+              step="0.1"
+              placeholder="Expected package"
+              required
+            />
           </div>
 
           <div class="input-group">
-            <label>Application Link</label>
-            <input type="url" placeholder="Paste application link" />
+            <label for="applicationlink">Application Link</label>
+            <input
+              id="applicationlink"
+              type="url"
+              placeholder="Paste application link"
+              required
+            />
           </div>
 
           <div class="input-group full-width resume-upload">
@@ -134,51 +155,111 @@
 
               <span id="fileName">No file selected</span>
 
-              <button type="button" id="previewBtn" disabled>
+              <button
+                type="button"
+                id="previewBtn"
+                aria-label="Preview resume"
+                disabled
+              >
                 <i class="fa-solid fa-eye"></i>
               </button>
             </div>
           </div>
 
           <div class="input-group full-width">
-            <label>Notes</label>
-            <textarea rows="5" placeholder="Write notes here..."></textarea>
+            <label for="notes">Notes</label>
+            <textarea
+              id="notes"
+              rows="5"
+              placeholder="Write notes here..."
+            ></textarea>
           </div>
 
           <button type="submit">Save Application</button>
         </form>
+      </section>
+    </main>
+
+    <!-- Application Detail Modal -->
+    <div
+      id="appDetailModal"
+      class="modal-overlay"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modalTitle"
+    >
+      <div class="modal-card">
+        <div class="modal-header">
+          <h2 id="modalTitle">
+            <i class="fa-solid fa-file-lines"></i> Application Details
+          </h2>
+          <button
+            id="modalCloseBtn"
+            class="modal-close-btn"
+            aria-label="Close modal"
+          >
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <div class="modal-row">
+            <span class="modal-label"
+              ><i class="fa-solid fa-building"></i> Company</span
+            >
+            <span class="modal-value" id="modalCompany">--</span>
+          </div>
+          <div class="modal-row">
+            <span class="modal-label"
+              ><i class="fa-solid fa-briefcase"></i> Role</span
+            >
+            <span class="modal-value" id="modalRole">--</span>
+          </div>
+          <div class="modal-row">
+            <span class="modal-label"
+              ><i class="fa-solid fa-indian-rupee-sign"></i> Package</span
+            >
+            <span class="modal-value" id="modalPackage">--</span>
+          </div>
+          <div class="modal-row">
+            <span class="modal-label"
+              ><i class="fa-solid fa-circle-dot"></i> Status</span
+            >
+            <span class="modal-value"
+              ><span id="modalStatus" class="modal-status">--</span></span
+            >
+          </div>
+          <div class="modal-row">
+            <span class="modal-label"
+              ><i class="fa-solid fa-calendar"></i> Applied Date</span
+            >
+            <span class="modal-value" id="modalDate">--</span>
+          </div>
+          <div class="modal-row">
+            <span class="modal-label"
+              ><i class="fa-solid fa-link"></i> Link</span
+            >
+            <span class="modal-value"
+              ><a id="modalLink" class="modal-link">--</a></span
+            >
+          </div>
+          <div class="modal-row">
+            <span class="modal-label"
+              ><i class="fa-solid fa-file"></i> Resume</span
+            >
+            <span class="modal-value" id="modalResume">--</span>
+          </div>
+          <div class="modal-row modal-notes-row">
+            <span class="modal-label"
+              ><i class="fa-solid fa-note-sticky"></i> Notes</span
+            >
+            <span class="modal-value" id="modalNotes">--</span>
+          </div>
+        </div>
       </div>
     </div>
+
+    <script src="../js/dataService.js"></script>
+    <script src="../js/applications.js"></script>
   </body>
-  <script>
-    const fileInput = document.getElementById("resume");
-    const uploadBtn = document.getElementById("uploadBtn");
-    const previewBtn = document.getElementById("previewBtn");
-    const fileName = document.getElementById("fileName");
-
-    let uploadedFile = null;
-
-    uploadBtn.addEventListener("click", () => {
-      fileInput.click();
-    });
-
-    fileInput.addEventListener("change", () => {
-      uploadedFile = fileInput.files[0];
-
-      if (uploadedFile) {
-        fileName.textContent = uploadedFile.name;
-        previewBtn.disabled = false;
-      }
-    });
-
-    previewBtn.addEventListener("click", () => {
-      if (!uploadedFile) {
-        alert("Please select a file first!");
-        return;
-      }
-
-      const fileURL = URL.createObjectURL(uploadedFile);
-      window.open(fileURL, "_blank");
-    });
-  </script>
 </html>

@@ -89,9 +89,8 @@ ul {
 
 .container {
   width: 90%;
-  max-width: 1200px;
-  margin: auto;
-  padding: 40px 0;
+  max-width: 1400px;
+  margin: 30px auto;
 }
 
 .container h1 {
@@ -165,13 +164,70 @@ td {
 }
 
 th {
-  color: #8b5cf6;
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
-.empty-row {
+/* ===========================
+   STATUS FILTER BUTTON (th > select)
+=========================== */
+
+#selectFilter {
+  appearance: none;
+  -webkit-appearance: none;
+  background: linear-gradient(
+    135deg,
+    rgba(139, 92, 246, 0.18),
+    rgba(108, 99, 255, 0.12)
+  );
+  border: 1.5px solid rgba(139, 92, 246, 0.55);
+  border-radius: 999px;
+  color: #c4b5fd;
+  font-family: "Poppins", sans-serif;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  padding: 7px 36px 7px 16px;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 0 0 0 rgba(139, 92, 246, 0);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238b5cf6' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 14px;
+  transition:
+    border-color 0.25s,
+    box-shadow 0.25s,
+    background-color 0.25s,
+    color 0.25s;
+  min-width: 120px;
   text-align: center;
-  padding: 40px;
-  color: #cbd5e1;
+  outline: none;
+}
+
+#selectFilter:hover {
+  border-color: #8b5cf6;
+  background-color: rgba(139, 92, 246, 0.25);
+  color: #e9d5ff;
+  box-shadow:
+    0 0 0 3px rgba(139, 92, 246, 0.18),
+    0 4px 16px rgba(139, 92, 246, 0.25);
+}
+
+#selectFilter:focus {
+  border-color: #a78bfa;
+  box-shadow:
+    0 0 0 3px rgba(139, 92, 246, 0.3),
+    0 4px 20px rgba(139, 92, 246, 0.3);
+  color: #f3e8ff;
+}
+
+#selectFilter option {
+  background: #1e293b;
+  color: #e2e8f0;
+  font-weight: 500;
 }
 
 /* Status Badges */
@@ -369,4 +425,172 @@ button:hover {
     flex-wrap: wrap;
     justify-content: center;
   }
+}
+
+/* ===========================
+   APPLICATION DETAIL MODAL
+=========================== */
+
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(6px);
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.modal-overlay.active {
+  display: flex;
+}
+
+.modal-card {
+  background: #1e293b;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 540px;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
+  animation: modalSlideIn 0.25s ease;
+  border: 1px solid rgba(139, 92, 246, 0.2);
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 22px 26px 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.modal-header h2 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #e2e8f0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.modal-header h2 i {
+  color: #8b5cf6;
+}
+
+.modal-close-btn {
+  all: unset;
+  cursor: pointer;
+  color: #94a3b8;
+  font-size: 1.2rem;
+  grid-column: unset;
+  padding: 6px 10px;
+  border-radius: 8px;
+  transition:
+    background 0.2s,
+    color 0.2s;
+  line-height: 1;
+}
+
+.modal-close-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  opacity: 1;
+}
+
+.modal-body {
+  padding: 20px 26px 26px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.modal-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 10px;
+}
+
+.modal-label {
+  min-width: 130px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-shrink: 0;
+}
+
+.modal-label i {
+  color: #8b5cf6;
+  width: 14px;
+  text-align: center;
+}
+
+.modal-value {
+  font-size: 0.92rem;
+  color: #e2e8f0;
+  font-weight: 500;
+  word-break: break-word;
+}
+
+.modal-notes-row {
+  align-items: flex-start;
+}
+
+.modal-notes-row .modal-value {
+  white-space: pre-wrap;
+  color: #cbd5e1;
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+
+/* Modal status badge mirrors table badges */
+.modal-status {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.modal-status.applied {
+  background: #2563eb;
+}
+.modal-status.interview {
+  background: #f59e0b;
+}
+.modal-status.offer {
+  background: #10b981;
+}
+.modal-status.rejected {
+  background: #ef4444;
+}
+
+/* Modal link — show as text, still clickable if href exists */
+.modal-link {
+  color: #818cf8;
+  text-decoration: none;
+  word-break: break-all;
+  font-size: 0.88rem;
+  transition: color 0.2s;
+}
+
+.modal-link[href]:hover {
+  color: #a5b4fc;
+  text-decoration: underline;
 }

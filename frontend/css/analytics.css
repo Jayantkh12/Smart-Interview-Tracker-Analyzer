@@ -1,0 +1,344 @@
+/* ============================================================
+   analytics.css – Smart Interview Tracker & Analyzer
+   Extends the dark design system used across the app.
+============================================================ */
+
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap");
+
+/* ── Reset ── */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: #0f172a;
+  color: #ffffff;
+  min-height: 100vh;
+}
+a {
+  text-decoration: none;
+}
+ul {
+  list-style: none;
+}
+
+/* ── Navbar ── */
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 8%;
+  background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #6c63ff;
+}
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
+.nav-links a {
+  color: white;
+  font-weight: 500;
+  transition: 0.3s;
+}
+.nav-links a:hover,
+.nav-links a.active {
+  color: #8b5cf6;
+}
+.menu-btn {
+  display: none;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.8rem;
+  cursor: pointer;
+}
+
+/* ── Layout ── */
+.container {
+  width: 90%;
+  max-width: 1400px;
+  margin: 30px auto;
+}
+.container h1 {
+  margin-bottom: 25px;
+  font-size: 1.8rem;
+}
+.container h1 i {
+  margin-right: 10px;
+  color: #38bdf8;
+}
+
+/* ── Headline Stats ── */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 18px;
+  margin-bottom: 25px;
+}
+.stat-card {
+  background: #1e293b;
+  padding: 22px 20px;
+  border-radius: 12px;
+  text-align: center;
+  transition: transform 0.2s;
+}
+.stat-card:hover {
+  transform: translateY(-3px);
+}
+.stat-card i {
+  font-size: 1.5rem;
+  color: #6c63ff;
+  margin-bottom: 8px;
+}
+.stat-card h3 {
+  font-size: 0.85rem;
+  color: #94a3b8;
+  margin-bottom: 6px;
+}
+.stat-card p {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #38bdf8;
+}
+
+/* ── Section Cards ── */
+.card {
+  background: #1e293b;
+  padding: 25px;
+  border-radius: 12px;
+  margin-bottom: 25px;
+}
+.card h2 {
+  margin-bottom: 18px;
+  color: #38bdf8;
+  font-size: 1.1rem;
+}
+.card h2 i {
+  margin-right: 8px;
+}
+
+.empty {
+  color: #94a3b8;
+  padding: 8px 0;
+  font-size: 0.9rem;
+}
+
+/* ── Status Breakdown Bars ── */
+.breakdown-list {
+  display: grid;
+  gap: 12px;
+}
+.breakdown-row {
+  display: grid;
+  grid-template-columns: 90px 1fr 90px;
+  align-items: center;
+  gap: 12px;
+}
+.breakdown-label {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+.breakdown-bar-wrap {
+  height: 10px;
+  background: #0f172a;
+  border-radius: 999px;
+  overflow: hidden;
+}
+.breakdown-bar {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.6s ease;
+}
+.breakdown-bar.applied {
+  background: #38bdf8;
+}
+.breakdown-bar.interview {
+  background: #a78bfa;
+}
+.breakdown-bar.offer {
+  background: #34d399;
+}
+.breakdown-bar.rejected {
+  background: #f87171;
+}
+
+.breakdown-count {
+  font-size: 0.82rem;
+  color: #94a3b8;
+  text-align: right;
+}
+
+/* ── Monthly Bar Chart ── */
+.bar-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 18px;
+  height: 160px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+.bar-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+}
+.bar {
+  position: relative;
+  width: 100%;
+  max-width: 50px;
+  background: linear-gradient(180deg, #6c63ff 0%, #38bdf8 100%);
+  border-radius: 6px 6px 0 0;
+  min-height: 6px;
+  transition: height 0.4s ease;
+  cursor: default;
+}
+.bar-value {
+  position: absolute;
+  top: -22px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #e2e8f0;
+  white-space: nowrap;
+}
+.bar-label {
+  font-size: 0.72rem;
+  color: #94a3b8;
+  white-space: nowrap;
+}
+
+/* ── Top Companies ── */
+.company-list {
+  display: grid;
+  gap: 10px;
+}
+.company-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  background: #0f172a;
+  border-radius: 8px;
+}
+.company-rank {
+  font-size: 0.8rem;
+  color: #6c63ff;
+  font-weight: 700;
+  min-width: 30px;
+}
+.company-name {
+  flex: 1;
+  font-weight: 600;
+}
+.company-count {
+  font-size: 0.8rem;
+  color: #94a3b8;
+}
+
+/* ── Questions Log ── */
+.questions-log {
+  display: grid;
+  gap: 14px;
+}
+.question-card {
+  background: #0f172a;
+  border-left: 3px solid #6c63ff;
+  border-radius: 0 8px 8px 0;
+  padding: 14px 16px;
+}
+.question-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.question-header strong {
+  font-size: 1rem;
+}
+.question-header span {
+  font-size: 0.8rem;
+  color: #94a3b8;
+}
+.question-card p {
+  font-size: 0.87rem;
+  color: #cbd5e1;
+  margin-top: 4px;
+}
+.question-card p em {
+  color: #a78bfa;
+  font-style: normal;
+  font-weight: 600;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    gap: 15px;
+  }
+  .menu-btn {
+    display: block;
+  }
+  .nav-links {
+    display: none;
+    flex-direction: column;
+    position: absolute;
+    top: 70px;
+    right: 0;
+    width: 160px;
+    background: #111827;
+    padding: 20px;
+    gap: 15px;
+    border-radius: 0 0 0 10px;
+  }
+  .nav-links.active {
+    display: flex;
+  }
+
+  .breakdown-row {
+    grid-template-columns: 80px 1fr;
+    grid-template-rows: auto auto;
+  }
+  .breakdown-count {
+    grid-column: 2;
+  }
+
+  .bar-chart {
+    gap: 8px;
+    height: 120px;
+  }
+  .bar-label {
+    font-size: 0.65rem;
+  }
+
+  .company-row {
+    flex-wrap: wrap;
+  }
+  .question-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+}

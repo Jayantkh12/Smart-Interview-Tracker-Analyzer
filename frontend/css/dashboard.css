@@ -148,6 +148,26 @@ ul {
   padding: 10px 0;
 }
 
+.mini-list {
+  display: grid;
+  gap: 12px;
+}
+
+.mini-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: #0f172a;
+}
+
+.mini-item span {
+  color: #cbd5e1;
+  text-align: right;
+}
+
 /* Difficulty */
 
 .difficulty {
@@ -217,5 +237,14 @@ ul {
   .difficulty {
     flex-direction: column;
     gap: 10px;
+  }
+
+  .mini-item {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .mini-item span {
+    text-align: left;
   }
 }

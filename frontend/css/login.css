@@ -248,6 +248,20 @@ button[type="submit"]:hover {
   color: #8b5cf6;
 }
 
+/* Form validation error message */
+.form-error {
+  color: #f87171;
+  font-size: 0.87rem;
+  margin-top: 8px;
+  text-align: center;
+  display: block;
+}
+
+button[type="submit"]:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 /* ===========================
    FOOTER
 =========================== */

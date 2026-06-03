@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Analytics | Smart Interview Tracker</title>
+    <meta
+      name="description"
+      content="View your interview analytics, status breakdown, monthly trends, and top companies on Smart Interview Tracker."
+    />
+
+    <link rel="stylesheet" href="../css/analytics.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    />
+  </head>
+
+  <body>
+    <!-- ── Navbar ── -->
+    <nav class="navbar">
+      <div class="logo">
+        <i class="fa-solid fa-briefcase"></i>
+        <span>InterviewTracker</span>
+      </div>
+
+      <button class="menu-btn" id="menuBtn" aria-label="Open navigation">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+
+      <ul class="nav-links" id="navLinks">
+        <li><a href="dashboard.html">Dashboard</a></li>
+        <li><a href="applications.html">Applications</a></li>
+        <li><a href="analytics.html" class="active">Analytics</a></li>
+        <li><a href="profile.html">Profile</a></li>
+        <li><a href="../index.html">Logout</a></li>
+      </ul>
+    </nav>
+
+    <main class="container">
+      <h1><i class="fa-solid fa-chart-line"></i> Analytics</h1>
+
+      <!-- ── Headline Stats ── -->
+      <section class="stats-grid" aria-label="Analytics headline statistics">
+        <div class="stat-card">
+          <i class="fa-solid fa-layer-group"></i>
+          <h3>Total Applications</h3>
+          <p id="analyticsTotal">0</p>
+        </div>
+
+        <div class="stat-card">
+          <i class="fa-solid fa-calendar-check"></i>
+          <h3>Interviews</h3>
+          <p id="analyticsInterviews">0</p>
+        </div>
+
+        <div class="stat-card">
+          <i class="fa-solid fa-trophy"></i>
+          <h3>Offers</h3>
+          <p id="analyticsOffers">0</p>
+        </div>
+
+        <div class="stat-card">
+          <i class="fa-solid fa-circle-xmark"></i>
+          <h3>Rejected</h3>
+          <p id="analyticsRejected">0</p>
+        </div>
+
+        <div class="stat-card">
+          <i class="fa-solid fa-arrow-trend-up"></i>
+          <h3>Offer Rate</h3>
+          <p id="conversionRate">0%</p>
+        </div>
+
+        <div class="stat-card">
+          <i class="fa-solid fa-comments"></i>
+          <h3>Interview Rate</h3>
+          <p id="interviewRate">0%</p>
+        </div>
+
+        <div class="stat-card">
+          <i class="fa-solid fa-clock"></i>
+          <h3>Avg. Days to Interview</h3>
+          <p id="avgDaysToInterview">N/A</p>
+        </div>
+      </section>
+
+      <!-- ── Status Breakdown ── -->
+      <section class="card">
+        <h2><i class="fa-solid fa-chart-pie"></i> Status Breakdown</h2>
+        <div
+          id="statusBreakdown"
+          class="breakdown-list"
+          aria-label="Application status breakdown"
+        >
+          <p class="empty">Loading…</p>
+        </div>
+      </section>
+
+      <!-- ── Applications Per Month ── -->
+      <section class="card">
+        <h2><i class="fa-solid fa-calendar"></i> Applications Per Month</h2>
+        <div
+          id="monthlyChart"
+          class="bar-chart"
+          aria-label="Monthly application bar chart"
+        >
+          <p class="empty">Loading…</p>
+        </div>
+      </section>
+
+      <!-- ── Top Companies ── -->
+      <section class="card">
+        <h2><i class="fa-solid fa-building"></i> Top Companies Applied To</h2>
+        <div
+          id="topCompanies"
+          class="company-list"
+          aria-label="Top companies by application count"
+        >
+          <p class="empty">Loading…</p>
+        </div>
+      </section>
+
+      <!-- ── Interview Questions Log ── -->
+      <section class="card">
+        <h2>
+          <i class="fa-solid fa-clipboard-question"></i> Interview Questions Log
+        </h2>
+        <div
+          id="questionsLog"
+          class="questions-log"
+          aria-label="Interview questions and prep notes"
+        >
+          <p class="empty">Loading…</p>
+        </div>
+      </section>
+    </main>
+
+    <script src="../js/dataService.js"></script>
+    <script src="../js/analytics.js"></script>
+  </body>
+</html>

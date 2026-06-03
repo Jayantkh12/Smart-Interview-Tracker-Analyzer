@@ -42,7 +42,7 @@
         <h2>Create Account</h2>
         <p>Register to get started</p>
 
-        <form>
+        <form id="registerForm">
           <div class="input-group">
             <label for="name">Full Name</label>
             <input
@@ -107,7 +107,9 @@
             </label>
           </div>
 
-          <button type="submit">Register</button>
+          <button type="submit" id="registerBtn">Register</button>
+
+          <p id="registerError" class="form-error" style="display: none"></p>
 
           <div class="register-link">
             Already have an account?
@@ -155,5 +157,7 @@
         </p>
       </div>
     </footer>
+    <script src="../js/dataService.js"></script>
+    <script src="../js/register.js"></script>
   </body>
 </html>

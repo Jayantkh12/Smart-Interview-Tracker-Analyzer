@@ -6,12 +6,12 @@
     <title>Dashboard | Smart Interview Tracker</title>
 
     <link rel="stylesheet" href="../css/dashboard.css" />
-
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
     />
   </head>
+
   <body>
     <nav class="navbar">
       <div class="logo">
@@ -19,107 +19,132 @@
         <span>InterviewTracker</span>
       </div>
 
-      <button class="menu-btn" id="menuBtn">☰</button>
+      <button class="menu-btn" id="menuBtn" aria-label="Open navigation">
+        <i class="fa-solid fa-bars"></i>
+      </button>
 
       <ul class="nav-links">
         <li><a href="dashboard.html">Dashboard</a></li>
         <li><a href="applications.html">Applications</a></li>
+        <li><a href="analytics.html">Analytics</a></li>
         <li><a href="profile.html">Profile</a></li>
         <li><a href="../index.html">Logout</a></li>
       </ul>
     </nav>
 
-    <div class="container">
-      <h1 class="welcome">Welcome Back, Jayant 👋</h1>
+    <main class="container">
+      <h1 class="welcome" id="welcomeMessage">Welcome Back</h1>
 
-      <!-- Stats -->
-      <div class="stats-grid">
+      <section class="stats-grid" aria-label="Dashboard statistics">
         <div class="stat-card">
           <h3>Total Applications</h3>
-          <p>0</p>
+          <p id="dashboardTotalApplications">0</p>
         </div>
 
         <div class="stat-card">
           <h3>Interviews</h3>
-          <p>0</p>
+          <p id="dashboardInterviews">0</p>
         </div>
 
         <div class="stat-card">
           <h3>Offers</h3>
-          <p>0</p>
+          <p id="dashboardOffers">0</p>
         </div>
 
         <div class="stat-card">
           <h3>Rejections</h3>
-          <p>0</p>
+          <p id="dashboardRejections">0</p>
         </div>
-      </div>
+      </section>
 
-      <!-- Resume -->
-      <div class="card">
+      <section class="card">
         <h2>Resume Management</h2>
 
         <div class="info">
-          <p><strong>Active Resume:</strong> No Resume Uploaded</p>
-          <p><strong>ATS Score:</strong> Not Available</p>
-          <p><strong>Last Updated:</strong> --</p>
-          <p><strong>Total Resumes:</strong> 0</p>
+          <p>
+            <strong>Active Resume:</strong>
+            <span id="activeResume">No Resume Uploaded</span>
+          </p>
+          <p>
+            <strong>ATS Score:</strong> <span id="atsScore">Not Available</span>
+          </p>
+          <p>
+            <strong>Last Updated:</strong>
+            <span id="resumeLastUpdated">--</span>
+          </p>
+          <p>
+            <strong>Total Resumes:</strong> <span id="totalResumes">0</span>
+          </p>
         </div>
-      </div>
+      </section>
 
-      <!-- Recent Applications -->
-      <div class="card">
+      <section class="card">
         <h2>Recent Applications</h2>
-        <div class="empty">No applications added yet.</div>
-      </div>
+        <div class="empty" id="recentApplications">
+          No applications added yet.
+        </div>
+      </section>
 
-      <!-- Upcoming Interviews -->
-      <div class="card">
+      <section class="card">
         <h2>Upcoming Interviews</h2>
-        <div class="empty">No interviews scheduled yet.</div>
-      </div>
+        <div class="empty" id="upcomingInterviews">
+          No interviews scheduled yet.
+        </div>
+      </section>
 
-      <!-- Interview Analysis -->
-      <div class="card">
+      <section class="card">
         <h2>Interview Questions Analysis</h2>
-        <div class="empty">No interview data available.</div>
-      </div>
+        <div class="empty" id="questionAnalysis">
+          No interview data available.
+        </div>
+      </section>
 
-      <!-- Recently Asked Questions -->
-      <div class="card">
+      <section class="card">
         <h2>Recently Asked Questions</h2>
-        <div class="empty">No questions recorded yet.</div>
-      </div>
+        <div class="empty" id="recentQuestions">No questions recorded yet.</div>
+      </section>
 
-      <!-- Resume Analytics -->
-      <div class="card">
+      <section class="card">
         <h2>Resume Usage Analytics</h2>
-        <div class="empty">Upload resumes to view analytics.</div>
-      </div>
+        <div class="empty" id="resumeAnalytics">
+          Upload resumes to view analytics.
+        </div>
+      </section>
 
-      <!-- Difficulty -->
-      <div class="card">
+      <section class="card">
         <h2>Difficulty Breakdown</h2>
 
         <div class="difficulty">
-          <span>Easy : 0</span>
-          <span>Medium : 0</span>
-          <span>Hard : 0</span>
+          <span>Easy : <span id="difficultyEasy">0</span></span>
+          <span>Medium : <span id="difficultyMedium">0</span></span>
+          <span>Hard : <span id="difficultyHard">0</span></span>
         </div>
-      </div>
+      </section>
 
-      <!-- Quick Actions -->
-      <div class="card">
+      <section class="card">
         <h2>Quick Actions</h2>
 
         <div class="actions">
-          <button>+ Add Application</button>
-          <button>+ Schedule Interview</button>
-          <button>+ Add Questions Asked</button>
-          <button>+ Upload Resume</button>
-          <button>+ Switch Resume</button>
+          <button type="button" data-href="applications.html">
+            + Add Application
+          </button>
+          <button type="button" data-href="applications.html">
+            + Schedule Interview
+          </button>
+          <button type="button" data-href="applications.html">
+            + Add Questions Asked
+          </button>
+          <button type="button" data-href="profile.html">
+            + Upload Resume
+          </button>
+          <button type="button" data-href="profile.html">
+            + Switch Resume
+          </button>
         </div>
-      </div>
-    </div>
+      </section>
+    </main>
+
+    <script src="../js/dataService.js"></script>
+    <script src="../js/dashboard.js"></script>
   </body>
 </html>
