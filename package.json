@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "cors": "^2.8.6",
+    "mysql2": "^3.22.5",
+    "nodemailer": "^9.0.1"
+  }
+}

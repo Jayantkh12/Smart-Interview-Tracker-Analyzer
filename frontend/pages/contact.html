@@ -66,21 +66,31 @@
       </div>
 
       <div class="contact-form">
-        <form>
+        <form id="contactForm">
           <div class="input-group">
-            <input type="text" placeholder="Full Name" required />
+            <input type="text" id="name" placeholder="Full Name" required />
           </div>
 
           <div class="input-group">
-            <input type="email" placeholder="Email Address" required />
+            <input
+              type="email"
+              id="email"
+              placeholder="Email Address"
+              required
+            />
           </div>
 
           <div class="input-group">
-            <input type="text" placeholder="Subject" required />
+            <input type="text" id="subject" placeholder="Subject" required />
           </div>
 
           <div class="input-group">
-            <textarea rows="6" placeholder="Your Message" required></textarea>
+            <textarea
+              id="message"
+              rows="6"
+              placeholder="Your Message"
+              required
+            ></textarea>
           </div>
 
           <button type="submit">Send Message</button>
@@ -126,5 +136,6 @@
         <p>© 2026 Smart Interview Tracker & Analyzer. All Rights Reserved.</p>
       </div>
     </footer>
+    <script src="../js/contact.js"></script>
   </body>
 </html>
