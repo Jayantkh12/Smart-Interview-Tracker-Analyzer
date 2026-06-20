@@ -1,35 +1,49 @@
-const form = document.getElementById("registerForm");
+const registerForm = document.getElementById("registerForm");
+const errorBox = document.getElementById("registerError");
 
-form.addEventListener("submit", async (e) => {
+registerForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const name = document.getElementById("name").value;
-  const phone = document.getElementById("phone").value;
-  const email = document.getElementById("email").value;
+  const name = document.getElementById("name").value.trim();
+  const phone = document.getElementById("phone").value.trim();
+  const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value;
   const confirmPassword = document.getElementById("confirmPassword").value;
 
   if (password !== confirmPassword) {
-    alert("Passwords do not match");
+    errorBox.style.display = "block";
+    errorBox.textContent = "Passwords do not match";
     return;
   }
 
-  const response = await fetch("http://localhost:5500/register", {
-    method: "POST",
+  try {
+    const response = await fetch("http://localhost:5500/register", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name,
+        phone,
+        email,
+        password,
+      }),
+    });
 
-    headers: {
-      "Content-Type": "application/json",
-    },
+    const data = await response.json();
 
-    body: JSON.stringify({
-      name,
-      phone,
-      email,
-      password,
-    }),
-  });
+    if (data.success) {
+      alert("Registration Successful");
 
-  const data = await response.json();
+      window.location.href = "./profile.html";
+    } else {
+      errorBox.style.display = "block";
+      errorBox.textContent = data.message;
+    }
+  } catch (err) {
+    console.error(err);
 
-  alert(data.message);
+    errorBox.style.display = "block";
+    errorBox.textContent = "Server Error";
+  }
 });

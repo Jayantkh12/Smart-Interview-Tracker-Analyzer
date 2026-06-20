@@ -3,6 +3,7 @@ const nodemailer = require("nodemailer");
 const cors = require("cors");
 const db = require("./config/db");
 const app = express();
+const bcrypt = require("bcryptjs");
 
 // JSON data receive karne ke liye
 app.use(express.json());
@@ -103,12 +104,15 @@ app.post("/register", async (req, res) => {
       });
     }
 
+    const hashedPassword = await bcrypt.hash(password, 10);
+
     await db.query(
       "INSERT INTO Users (name, phoneNo, email, password) VALUES (?, ?, ?, ?)",
-      [name, phone, email, password],
+      [name, phone, email, hashedPassword],
     );
 
     res.json({
+      success: true,
       message: "Account Created Successfully",
     });
   } catch (error) {
@@ -130,26 +134,103 @@ app.post("/login", async (req, res) => {
     ]);
 
     if (users.length === 0) {
-      return res.json({
+      return res.status(404).json({
+        success: false,
         message: "User Not Found",
       });
     }
 
-    const user = users[0];
+    const match = await bcrypt.compare(password, users[0].password);
 
-    if (user.password !== password) {
-      return res.json({
-        message: "Wrong Password",
+    if (!match) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid Password",
       });
     }
 
     res.json({
+      success: true,
       message: "Login Successful",
       user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
+        id: users[0].id,
+        name: users[0].name,
+        email: users[0].email,
       },
+    });
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
+    });
+  }
+});
+
+// dashboard
+
+app.get("/api/dashboard/stats/:userId", async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const [applications] = await db.query(
+      `SELECT COUNT(*) AS totalApplications FROM Applications WHERE user_id = ?`,
+      [userId],
+    );
+
+    const [interviews] = await db.query(
+      `SELECT COUNT(*) AS totalInterviews FROM InterviewRounds ir JOIN Applications a ON ir.application_id = a.application_id WHERE a.user_id = ?`,
+      [userId],
+    );
+
+    const [offers] = await db.query(
+      `SELECT COUNT(*) AS totalOffers FROM Applications WHERE user_id = ? AND status = 'Selected'`,
+      [userId],
+    );
+
+    const [rejections] = await db.query(
+      `SELECT COUNT(*) AS totalRejectionsFROM ApplicationsWHERE user_id = ?AND status = 'Rejected'`,
+      [userId],
+    );
+
+    res.json({
+      applications: applications[0].totalApplications,
+      interviews: interviews[0].totalInterviews,
+      offers: offers[0].totalOffers,
+      rejections: rejections[0].totalRejections,
+    });
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
+    });
+  }
+});
+
+app.get("/api/dashboard/resume/:userId", async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const [resumes] = await db.query(
+      `SELECT * FROM Resumes WHERE user_id = ? ORDER BY upload_date DESC`,
+      [userId],
+    );
+
+    if (resumes.length === 0) {
+      return res.json({
+        activeResume: "No Resume Uploaded",
+        lastUpdated: "--",
+        totalResumes: 0,
+      });
+    }
+
+    res.json({
+      activeResume: resumes[0].resume_title,
+      lastUpdated: resumes[0].upload_date,
+      totalResumes: resumes.length,
     });
   } catch (error) {
     console.log(error);
@@ -159,6 +240,26 @@ app.post("/login", async (req, res) => {
     });
   }
 });
+
+app.get("/api/dashboard/recent-applications/:userId", async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const [applications] = await db.query(
+      `SELECT a.application_id, c.company_name, a.role, a.status, a.application_dat FROM Applications  JOIN Companies  ON a.company_id = c.company_i WHERE a.user_id =  ORDER BY a.application_date DES LIMIT 5`,
+      [userId],
+    );
+
+    res.json(applications);
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).json({
+      message: "Server Error",
+    });
+  }
+});
+
 app.listen(5500, () => {
   console.log("Server running on port 5500");
 });

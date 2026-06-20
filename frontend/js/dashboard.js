@@ -1,165 +1,80 @@
-document.addEventListener("DOMContentLoaded", () => {
-  const dataService = window.DataService;
+const user = JSON.parse(localStorage.getItem("user"));
 
-  if (!dataService) {
-    console.error("DataService is not loaded.");
-    return;
-  }
+if (!user) {
+  window.location.href = "./login.html";
+}
 
-  function escapeHtml(value) {
-    return String(value ?? "")
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#039;");
-  }
+document.getElementById("welcomeMessage").textContent =
+  `Welcome Back, ${user.name} 👋`;
 
-  function formatDate(dateValue) {
-    if (!dateValue) {
-      return "--";
-    }
-
-    return new Date(dateValue).toLocaleDateString("en-IN", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-    });
-  }
-
-  function setText(id, value) {
-    const element = document.getElementById(id);
-
-    if (element) {
-      element.textContent = value;
-    }
-  }
-
-  function renderList(containerId, items, emptyText, renderItem) {
-    const container = document.getElementById(containerId);
-
-    if (!container) {
-      return;
-    }
-
-    if (!items.length) {
-      container.className = "empty";
-      container.textContent = emptyText;
-      return;
-    }
-
-    container.className = "mini-list";
-    container.innerHTML = items.map(renderItem).join("");
-  }
-
-  function renderDashboardStats() {
-    const stats = dataService.getStats();
-
-    setText("dashboardTotalApplications", stats.total);
-    setText("dashboardInterviews", stats.interview);
-    setText("dashboardOffers", stats.offers);
-    setText("dashboardRejections", stats.rejected);
-  }
-
-  function renderResumeSummary() {
-    const profile = dataService.getProfile();
-    const applications = dataService.getApplications();
-    const resumeNames = applications
-      .map((application) => application.resumeName)
-      .filter(Boolean);
-    const uniqueResumeNames = [...new Set(resumeNames)];
-    const activeResume = profile.resumeName || uniqueResumeNames[0] || "";
-    const lastResumeUpdate =
-      profile.updatedAt ||
-      applications
-        .filter((application) => application.resumeName)
-        .map((application) => application.updatedAt)
-        .sort()
-        .pop();
-
-    setText("activeResume", activeResume || "No Resume Uploaded");
-    setText("atsScore", "Not Available");
-    setText("resumeLastUpdated", formatDate(lastResumeUpdate));
-    setText("totalResumes", uniqueResumeNames.length + (profile.resumeName ? 1 : 0));
-  }
-
-  function renderRecentApplications() {
-    const applications = dataService.getRecentApplications(4);
-
-    renderList(
-      "recentApplications",
-      applications,
-      "No applications added yet.",
-      (application) => `
-        <div class="mini-item">
-          <strong>${escapeHtml(application.company)}</strong>
-          <span>${escapeHtml(application.role)} &middot; ${escapeHtml(application.status)}</span>
-        </div>
-      `,
-    );
-  }
-
-  function renderUpcomingInterviews() {
-    const interviews = dataService.getUpcomingInterviews(4);
-
-    renderList(
-      "upcomingInterviews",
-      interviews,
-      "No interviews scheduled yet.",
-      (application) => `
-        <div class="mini-item">
-          <strong>${escapeHtml(application.company)}</strong>
-          <span>${formatDate(application.interviewDate)} &middot; ${escapeHtml(application.role)}</span>
-        </div>
-      `,
-    );
-  }
-
-  function renderQuestions() {
-    const questions = dataService
-      .getApplications()
-      .filter((application) => application.questionsAsked)
-      .slice(0, 4);
-
-    renderList(
-      "recentQuestions",
-      questions,
-      "No questions recorded yet.",
-      (application) => `
-        <div class="mini-item">
-          <strong>${escapeHtml(application.company)}</strong>
-          <span>${escapeHtml(application.questionsAsked)}</span>
-        </div>
-      `,
+async function loadDashboardStats() {
+  try {
+    const response = await fetch(
+      `http://localhost:5500/api/dashboard/stats/${user.id}`,
     );
 
-    setText(
-      "questionAnalysis",
-      questions.length
-        ? `${questions.length} application records include interview questions.`
-        : "No interview data available.",
+    const data = await response.json();
+
+    document.getElementById("dashboardTotalApplications").textContent =
+      data.applications;
+
+    document.getElementById("dashboardInterviews").textContent =
+      data.interviews;
+
+    document.getElementById("dashboardOffers").textContent = data.offers;
+
+    document.getElementById("dashboardRejections").textContent =
+      data.rejections;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+loadDashboardStats();
+
+async function loadResumeData() {
+  try {
+    const response = await fetch(
+      `http://localhost:5500/api/dashboard/resume/${user.id}`,
     );
+
+    const data = await response.json();
+
+    document.getElementById("activeResume").textContent = data.activeResume;
+
+    document.getElementById("resumeLastUpdated").textContent = data.lastUpdated;
+
+    document.getElementById("totalResumes").textContent = data.totalResumes;
+  } catch (error) {
+    console.error(error);
   }
+}
 
-  function bindQuickActions() {
-    document.querySelectorAll(".actions button[data-href]").forEach((button) => {
-      button.addEventListener("click", () => {
-        window.location.href = button.dataset.href;
-      });
-    });
-  }
+loadResumeData();
 
-  function renderDashboard() {
-    const profile = dataService.getProfile();
+applications.forEach((app) => {
+  const row = document.createElement("tr");
 
-    setText("welcomeMessage", `Welcome Back, ${profile.fullName || "Student"}`);
-    renderDashboardStats();
-    renderResumeSummary();
-    renderRecentApplications();
-    renderUpcomingInterviews();
-    renderQuestions();
-    bindQuickActions();
-  }
+  const companyCell = document.createElement("td");
+  companyCell.textContent = app.company_name;
 
-  renderDashboard();
+  const roleCell = document.createElement("td");
+  roleCell.textContent = app.role;
+
+  const statusCell = document.createElement("td");
+  statusCell.textContent = app.status;
+
+  statusCell.classList.add(
+    `status-${app.status.toLowerCase().replace(/\s+/g, "-")}`,
+  );
+
+  const dateCell = document.createElement("td");
+  dateCell.textContent = new Date(app.application_date).toLocaleDateString();
+
+  row.appendChild(companyCell);
+  row.appendChild(roleCell);
+  row.appendChild(statusCell);
+  row.appendChild(dateCell);
+
+  tbody.appendChild(row);
 });
