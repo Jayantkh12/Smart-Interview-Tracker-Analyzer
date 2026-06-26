@@ -340,3 +340,61 @@ RECENT APPLICATIONS TABLE
     padding: 12px;
   }
 }
+
+// Upcoming Interviews
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.badge {
+  background: #3b82f6;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.interview-card {
+  background: #111827;
+  border-left: 4px solid #3b82f6;
+  padding: 16px;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  transition: 0.3s;
+}
+
+.interview-card:hover {
+  transform: translateY(-2px);
+}
+
+.interview-company {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.interview-role {
+  color: #9ca3af;
+  margin-bottom: 10px;
+}
+
+.interview-meta {
+  display: flex;
+  gap: 20px;
+  font-size: 14px;
+}
+
+.interview-empty {
+  text-align: center;
+  padding: 30px;
+  color: #9ca3af;
+}
+
+.interview-empty i {
+  font-size: 40px;
+  margin-bottom: 10px;
+}

@@ -77,18 +77,23 @@
           <thead>
             <tr>
               <th>Company</th>
+
               <th>Role</th>
-              <th>Expected Package</th>
+
+              <th id="packageSortBtn" class="sort-btn">Expected Package ↕</th>
+
               <th>
-                <select id="selectFilter" aria-label="Filter by status">
-                  <option value="All">All</option>
+                <select id="selectFilter">
+                  <option value="All">Status ▼</option>
                   <option value="Applied">Applied</option>
                   <option value="Interview">Interview</option>
                   <option value="Offer">Offer</option>
                   <option value="Rejected">Rejected</option>
                 </select>
               </th>
-              <th>Applied Update</th>
+
+              <th id="dateSortBtn" class="sort-btn">Applied Date ↕</th>
+
               <th>Actions</th>
             </tr>
           </thead>

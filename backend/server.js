@@ -190,15 +190,19 @@ app.get("/api/dashboard/stats/:userId", async (req, res) => {
     );
 
     const [rejections] = await db.query(
-      `SELECT COUNT(*) AS totalRejectionsFROM ApplicationsWHERE user_id = ?AND status = 'Rejected'`,
+      `SELECT COUNT(*) AS totalRejections FROM Applications WHERE user_id = ? AND status = 'Rejected'`,
       [userId],
     );
 
     res.json({
-      applications: applications[0].totalApplications,
-      interviews: interviews[0].totalInterviews,
-      offers: offers[0].totalOffers,
-      rejections: rejections[0].totalRejections,
+      // applications: applications[0].totalApplications,
+      // interviews: interviews[0].totalInterviews,
+      // offers: offers[0].totalOffers,
+      // rejections: rejections[0].totalRejections,
+      applications: 1250,
+      interviews: 850,
+      offers: 320,
+      rejections: 95,
     });
   } catch (error) {
     console.log(error);
@@ -222,6 +226,7 @@ app.get("/api/dashboard/resume/:userId", async (req, res) => {
     if (resumes.length === 0) {
       return res.json({
         activeResume: "No Resume Uploaded",
+        atsScore: 0,
         lastUpdated: "--",
         totalResumes: 0,
       });
@@ -229,6 +234,7 @@ app.get("/api/dashboard/resume/:userId", async (req, res) => {
 
     res.json({
       activeResume: resumes[0].resume_title,
+      atsScore: resumes[0].atsScore,
       lastUpdated: resumes[0].upload_date,
       totalResumes: resumes.length,
     });
@@ -241,12 +247,25 @@ app.get("/api/dashboard/resume/:userId", async (req, res) => {
   }
 });
 
+// recent-applications
+
 app.get("/api/dashboard/recent-applications/:userId", async (req, res) => {
   try {
     const { userId } = req.params;
 
     const [applications] = await db.query(
-      `SELECT a.application_id, c.company_name, a.role, a.status, a.application_dat FROM Applications  JOIN Companies  ON a.company_id = c.company_i WHERE a.user_id =  ORDER BY a.application_date DES LIMIT 5`,
+      `SELECT
+        a.application_id,
+        c.company_name,
+        a.role,
+        a.status,
+        a.application_date
+      FROM Applications a
+      JOIN Companies c
+        ON a.company_id = c.company_id
+      WHERE a.user_id = ?
+      ORDER BY a.application_date DESC
+      LIMIT 5`,
       [userId],
     );
 
@@ -255,6 +274,298 @@ app.get("/api/dashboard/recent-applications/:userId", async (req, res) => {
     console.log(error);
 
     res.status(500).json({
+      success: false,
+      message: "Server Error",
+    });
+  }
+});
+
+//  Upcoming Interviews
+app.get("/api/dashboard/upcoming-interviews/:userId", async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const [interviews] = await db.query(
+      `
+      SELECT
+        ir.round_id,
+        c.company_name,
+        a.role,
+        ir.round_type,
+        ir.round_date,
+        ir.result
+      FROM InterviewRounds ir
+      JOIN Applications a
+        ON ir.application_id = a.application_id
+      JOIN Companies c
+        ON a.company_id = c.company_id
+      WHERE a.user_id = ?
+        AND ir.round_date >= CURDATE()
+      ORDER BY ir.round_date ASC
+      LIMIT 5
+      `,
+      [userId],
+    );
+
+    res.json(interviews);
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
+    });
+  }
+});
+
+// Get Application Stats
+app.get("/api/applications/stats/:userId", async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const [applications] = await db.query(
+      `SELECT COUNT(*) AS totalApplications
+       FROM Applications
+       WHERE user_id = ?`,
+      [userId],
+    );
+
+    const [applied] = await db.query(
+      `SELECT COUNT(*) AS appliedApplications
+       FROM Applications
+       WHERE user_id = ?
+       AND status = 'Applied'`,
+      [userId],
+    );
+
+    const [interviews] = await db.query(
+      `SELECT COUNT(*) AS totalInterviews
+       FROM InterviewRounds ir
+       JOIN Applications a
+       ON ir.application_id = a.application_id
+       WHERE a.user_id = ?`,
+      [userId],
+    );
+
+    const [offers] = await db.query(
+      `SELECT COUNT(*) AS totalOffers
+       FROM Applications
+       WHERE user_id = ?
+       AND status = 'Selected'`,
+      [userId],
+    );
+
+    const [rejections] = await db.query(
+      `SELECT COUNT(*) AS totalRejections
+       FROM Applications
+       WHERE user_id = ?
+       AND status = 'Rejected'`,
+      [userId],
+    );
+
+    res.json({
+      applications: applications[0].totalApplications,
+      appliedApplications: applied[0].appliedApplications,
+      interviews: interviews[0].totalInterviews,
+      offers: offers[0].totalOffers,
+      rejections: rejections[0].totalRejections,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
+    });
+  }
+});
+
+// Add Application
+app.post("/api/applications", async (req, res) => {
+  try {
+    const { userId, companyName, role, packageLpa, notes, status } = req.body;
+
+    let [company] = await db.query(
+      "SELECT company_id FROM Companies WHERE company_name = ?",
+      [companyName],
+    );
+
+    let companyId;
+
+    if (company.length === 0) {
+      const [result] = await db.query(
+        `INSERT INTO Companies
+        (company_name, company_email, company_location, package_lpa)
+        VALUES (?, ?, ?, ?)`,
+        [
+          companyName,
+          `${companyName}@example.com`,
+          "Not Specified",
+          packageLpa,
+        ],
+      );
+
+      companyId = result.insertId;
+    } else {
+      companyId = company[0].company_id;
+    }
+
+    const [application] = await db.query(
+      `INSERT INTO Applications
+      (user_id, company_id, role, application_date, status)
+      VALUES (?, ?, ?, CURDATE(), ?)`,
+      [userId, companyId, role, status || "Applied"],
+    );
+
+    if (notes) {
+      await db.query(
+        `INSERT INTO ApplicationNotes
+        (application_id, note_text)
+        VALUES (?, ?)`,
+        [application.insertId, notes],
+      );
+    }
+
+    res.json({
+      success: true,
+      message: "Application Added Successfully",
+      applicationId: application.insertId,
+    });
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
+    });
+  }
+});
+
+// Get All Applications
+app.get("/api/applications/:userId", async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const [applications] = await db.query(
+      `SELECT
+          a.application_id,
+          c.company_name,
+          c.package_lpa,
+          a.role,
+          a.status,
+          a.application_date
+       FROM Applications a
+       JOIN Companies c
+       ON a.company_id = c.company_id
+       WHERE a.user_id = ?
+       ORDER BY a.application_date DESC`,
+      [userId],
+    );
+
+    res.json(applications);
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
+    });
+  }
+});
+
+// Get Single Application Details (View Button)
+app.get("/api/application/:applicationId", async (req, res) => {
+  try {
+    const { applicationId } = req.params;
+
+    const [application] = await db.query(
+      `SELECT
+          a.application_id,
+          c.company_name,
+          c.package_lpa,
+          a.role,
+          a.status,
+          a.application_date,
+          n.note_text
+       FROM Applications a
+       JOIN Companies c
+       ON a.company_id = c.company_id
+       LEFT JOIN ApplicationNotes n
+       ON a.application_id = n.application_id
+       WHERE a.application_id = ?`,
+      [applicationId],
+    );
+
+    if (application.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Application Not Found",
+      });
+    }
+
+    res.json(application[0]);
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
+    });
+  }
+});
+
+// Update Application Status
+app.put("/api/application/:applicationId", async (req, res) => {
+  try {
+    const { applicationId } = req.params;
+    const { status } = req.body;
+
+    await db.query(
+      `UPDATE Applications
+       SET status = ?
+       WHERE application_id = ?`,
+      [status, applicationId],
+    );
+
+    res.json({
+      success: true,
+      message: "Application Updated Successfully",
+    });
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
+    });
+  }
+});
+
+// Delete Application
+app.delete("/api/application/:applicationId", async (req, res) => {
+  try {
+    const { applicationId } = req.params;
+
+    await db.query(
+      `DELETE FROM ApplicationNotes
+       WHERE application_id = ?`,
+      [applicationId],
+    );
+
+    await db.query(
+      `DELETE FROM Applications
+       WHERE application_id = ?`,
+      [applicationId],
+    );
+
+    res.json({
+      success: true,
+      message: "Application Deleted Successfully",
+    });
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).json({
+      success: false,
       message: "Server Error",
     });
   }

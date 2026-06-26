@@ -1,239 +1,133 @@
-document.addEventListener("DOMContentLoaded", () => {
-  const dataService = window.DataService;
+const user = JSON.parse(localStorage.getItem("user"));
 
-  if (!dataService) {
-    console.error("DataService is not loaded.");
-    return;
-  }
-
-  const fileInput = document.getElementById("resume");
-  const uploadBtn = document.getElementById("uploadBtn");
-  const previewBtn = document.getElementById("previewBtn");
-  const fileName = document.getElementById("fileName");
-  const searchInput = document.getElementById("searchInput");
-  const statusFilter = document.getElementById("selectFilter");
-  const form = document.getElementById("applicationForm");
-  const body = document.getElementById("applicationsBody");
-
-  const stats = {
-    total: document.getElementById("totalApps"),
-    applied: document.getElementById("appliedApps"),
-    interview: document.getElementById("interviewApps"),
-    offers: document.getElementById("offerApps"),
-    rejected: document.getElementById("rejectedApps"),
-  };
-
-  let uploadedFile = null;
-
-  function escapeHtml(value) {
-    return String(value ?? "")
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#039;");
-  }
-
-  function formatDate(dateValue) {
-    if (!dateValue) {
-      return "--";
-    }
-
-    return new Date(dateValue).toLocaleDateString("en-IN", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-    });
-  }
-
-  function getFilteredApplications() {
-    const searchTerm = searchInput.value;
-    const status = statusFilter.value;
-
-    return dataService.searchApplications(searchTerm).filter((application) => {
-      return status === "All" || application.status === status;
-    });
-  }
-
-  function renderStats() {
-    const currentStats = dataService.getStats();
-
-    stats.total.textContent = currentStats.total;
-    stats.applied.textContent = currentStats.applied;
-    stats.interview.textContent = currentStats.interview;
-    stats.offers.textContent = currentStats.offers;
-    stats.rejected.textContent = currentStats.rejected;
-  }
-
-  function renderApplications() {
-    const applications = getFilteredApplications();
-
-    if (!applications.length) {
-      body.innerHTML = `
-        <tr>
-          <td colspan="6" class="empty-row">No applications found.</td>
-        </tr>
-      `;
-      return;
-    }
-
-    body.innerHTML = applications
-      .map((application) => {
-        const statusClass = application.status.toLowerCase();
-
-        return `
-          <tr>
-            <td>${escapeHtml(application.company)}</td>
-            <td>${escapeHtml(application.role)}</td>
-            <td>${escapeHtml(application.package || "--")}</td>
-            <td>
-              <span class="status ${statusClass}">
-                ${escapeHtml(application.status)}
-              </span>
-            </td>
-            <td>${formatDate(application.applicationDate)}</td>
-            <td>
-              <button
-                class="view-btn"
-                type="button"
-                data-id="${escapeHtml(application.id)}"
-              >
-                View
-              </button>
-            </td>
-          </tr>
-        `;
-      })
-      .join("");
-  }
-
-  function renderPage() {
-    renderStats();
-    renderApplications();
-  }
-
-  uploadBtn.addEventListener("click", () => {
-    fileInput.click();
-  });
-
-  fileInput.addEventListener("change", () => {
-    uploadedFile = fileInput.files[0] || null;
-
-    if (uploadedFile) {
-      fileName.textContent = uploadedFile.name;
-      previewBtn.disabled = false;
-      return;
-    }
-
-    fileName.textContent = "No file selected";
-    previewBtn.disabled = true;
-  });
-
-  previewBtn.addEventListener("click", () => {
-    if (!uploadedFile) {
-      alert("Please select a file first!");
-      return;
-    }
-
-    const fileURL = URL.createObjectURL(uploadedFile);
-    window.open(fileURL, "_blank");
-  });
-
-  searchInput.addEventListener("input", renderApplications);
-  statusFilter.addEventListener("change", renderApplications);
-
-  body.addEventListener("click", (event) => {
-    const viewButton = event.target.closest(".view-btn");
-
-    if (!viewButton) {
-      return;
-    }
-
-    const application = dataService.getApplicationById(viewButton.dataset.id);
-
-    if (!application) return;
-
-    // Populate modal fields
-    document.getElementById("modalCompany").textContent =
-      application.company || "--";
-    document.getElementById("modalRole").textContent = application.role || "--";
-    document.getElementById("modalPackage").textContent =
-      application.package || "--";
-    document.getElementById("modalStatus").textContent =
-      application.status || "--";
-    document.getElementById("modalStatus").className =
-      "modal-status " + (application.status || "").toLowerCase();
-    document.getElementById("modalDate").textContent = formatDate(
-      application.applicationDate,
+async function loadStats() {
+  try {
+    const response = await fetch(
+      `http://localhost:5500/api/applications/stats/${user.id}`,
     );
-    document.getElementById("modalNotes").textContent =
-      application.notes || "No notes added.";
-    document.getElementById("modalResume").textContent =
-      application.resumeName || "No resume uploaded.";
 
-    const linkEl = document.getElementById("modalLink");
-    if (application.applicationLink) {
-      linkEl.textContent = application.applicationLink;
-      linkEl.href = application.applicationLink;
-      linkEl.target = "_blank";
-      linkEl.rel = "noopener noreferrer";
-      linkEl.style.display = "inline";
-    } else {
-      linkEl.textContent = "No link provided.";
-      linkEl.removeAttribute("href");
-      linkEl.removeAttribute("target");
-      linkEl.style.display = "inline";
-    }
+    const data = await response.json();
 
-    document.getElementById("appDetailModal").classList.add("active");
+    document.getElementById("totalApps").textContent = data.applications;
+
+    document.getElementById("appliedApps").textContent =
+      data.appliedApplications;
+
+    document.getElementById("interviewApps").textContent = data.interviews;
+
+    document.getElementById("offerApps").textContent = data.offers;
+
+    document.getElementById("rejectedApps").textContent = data.rejections;
+  } catch (error) {
+    console.error("Error loading stats:", error);
+  }
+}
+
+loadStats();
+
+//search-bar
+
+const searchInput = document.getElementById("searchInput");
+
+searchInput.addEventListener("input", () => {
+  const searchText = searchInput.value.toLowerCase();
+  const rows = document.querySelectorAll("#applicationsBody tr");
+
+  rows.forEach((row) => {
+    const company = row.cells[0]?.textContent.toLowerCase() || "";
+
+    const role = row.cells[1]?.textContent.toLowerCase() || "";
+
+    const match = company.includes(searchText) || role.includes(searchText);
+
+    row.style.display = match ? "" : "none";
   });
+});
 
-  // Close modal
-  document.getElementById("modalCloseBtn").addEventListener("click", () => {
-    document.getElementById("appDetailModal").classList.remove("active");
-  });
+//application-form
 
-  document.getElementById("appDetailModal").addEventListener("click", (e) => {
-    if (e.target === e.currentTarget) {
-      e.currentTarget.classList.remove("active");
-    }
-  });
+const form = document.getElementById("applicationForm");
 
-  form.addEventListener("submit", (event) => {
-    event.preventDefault();
+const companyInput = document.getElementById("companyname");
+const roleInput = document.getElementById("jobrole");
+const packageInput = document.getElementById("package");
+const linkInput = document.getElementById("applicationlink");
+const notesInput = document.getElementById("notes");
 
-    const companyName = document.getElementById("companyname").value.trim();
-    const jobRole = document.getElementById("jobrole").value.trim();
-    const packageValue = document.getElementById("package").value.trim();
-    const applicationLink = document
-      .getElementById("applicationlink")
-      .value.trim();
-    const notes = document.getElementById("notes").value.trim();
+const resumeInput = document.getElementById("resume");
+const uploadBtn = document.getElementById("uploadBtn");
+const previewBtn = document.getElementById("previewBtn");
+const fileName = document.getElementById("fileName");
 
-    if (!companyName || !jobRole || !packageValue || !applicationLink) {
-      alert("Please fill all fields");
-      return;
-    }
+let selectedResume = null;
 
-    dataService.addApplication({
-      company: companyName,
-      role: jobRole,
-      package: `${packageValue} LPA`,
-      applicationLink,
-      notes,
-      status: dataService.STATUS.APPLIED,
-      resumeName: uploadedFile ? uploadedFile.name : "",
+// Open File Picker
+uploadBtn.addEventListener("click", () => {
+  resumeInput.click();
+});
+
+// File Selected
+resumeInput.addEventListener("change", () => {
+  const file = resumeInput.files[0];
+
+  if (!file) return;
+
+  selectedResume = file;
+
+  fileName.textContent = file.name;
+
+  previewBtn.disabled = false;
+});
+
+// Preview Resume
+previewBtn.addEventListener("click", () => {
+  if (!selectedResume) return;
+
+  const fileURL = URL.createObjectURL(selectedResume);
+
+  window.open(fileURL, "_blank");
+});
+
+// Save Application
+
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  try {
+    const response = await fetch("http://localhost:5500/api/applications", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        userId: user.id,
+        companyName: companyInput.value,
+        role: roleInput.value,
+        packageLpa: packageInput.value,
+        applicationLink: linkInput.value,
+        notes: notesInput.value,
+        status: "Applied",
+      }),
     });
 
-    form.reset();
-    uploadedFile = null;
-    fileName.textContent = "No file selected";
-    previewBtn.disabled = true;
-    searchInput.value = "";
-    statusFilter.value = "All";
+    const data = await response.json();
 
-    renderPage();
-  });
+    if (data.success) {
+      alert("Application Saved Successfully ✅");
 
-  renderPage();
+      form.reset();
+
+      selectedResume = null;
+      fileName.textContent = "No file selected";
+      previewBtn.disabled = true;
+
+      loadStats();
+      // loadApplications();
+    } else {
+      alert(data.message);
+    }
+  } catch (error) {
+    console.error("Error:", error);
+    alert("Failed to save application");
+  }
 });

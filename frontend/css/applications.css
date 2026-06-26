@@ -127,14 +127,32 @@ ul {
 /* Search */
 
 .search-box {
-  margin-bottom: 30px;
+  margin-bottom: 20px;
 }
 
 .search-box input {
   width: 100%;
-  padding: 14px;
-  border: none;
-  border-radius: 12px;
+  padding: 14px 18px;
+
+  background: #1e293b;
+  color: #ffffff;
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+
+  font-size: 0.95rem;
+  outline: none;
+
+  transition: all 0.3s ease;
+}
+
+.search-box input::placeholder {
+  color: #94a3b8;
+}
+
+.search-box input:focus {
+  border-color: #38bdf8;
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
 }
 
 /* Table */
@@ -171,63 +189,95 @@ th {
 }
 
 /* ===========================
-   STATUS FILTER BUTTON (th > select)
+   SORTABLE HEADERS
+=========================== */
+
+.sortable {
+  cursor: pointer;
+  user-select: none;
+
+  transition: all 0.3s ease;
+}
+
+.sortable:hover {
+  color: #38bdf8;
+}
+
+/* ===========================
+   STATUS FILTER
 =========================== */
 
 #selectFilter {
   appearance: none;
   -webkit-appearance: none;
+
+  min-width: 140px;
+  height: 40px;
+
+  padding: 0 18px;
+
+  border-radius: 999px;
+  border: 1.5px solid rgba(139, 92, 246, 0.55);
+
   background: linear-gradient(
     135deg,
     rgba(139, 92, 246, 0.18),
     rgba(108, 99, 255, 0.12)
   );
-  border: 1.5px solid rgba(139, 92, 246, 0.55);
-  border-radius: 999px;
-  color: #c4b5fd;
+
+  color: #e2e8f0;
+
   font-family: "Poppins", sans-serif;
-  font-size: 0.78rem;
+  font-size: 0.85rem;
   font-weight: 600;
-  letter-spacing: 0.05em;
-  padding: 7px 36px 7px 16px;
-  cursor: pointer;
-  backdrop-filter: blur(8px);
-  box-shadow: 0 0 0 0 rgba(139, 92, 246, 0);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238b5cf6' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 10px center;
-  background-size: 14px;
-  transition:
-    border-color 0.25s,
-    box-shadow 0.25s,
-    background-color 0.25s,
-    color 0.25s;
-  min-width: 120px;
+
   text-align: center;
+  text-align-last: center;
+
+  cursor: pointer;
   outline: none;
+
+  transition: all 0.3s ease;
 }
 
 #selectFilter:hover {
   border-color: #8b5cf6;
-  background-color: rgba(139, 92, 246, 0.25);
-  color: #e9d5ff;
+
   box-shadow:
-    0 0 0 3px rgba(139, 92, 246, 0.18),
-    0 4px 16px rgba(139, 92, 246, 0.25);
+    0 0 0 3px rgba(139, 92, 246, 0.15),
+    0 4px 16px rgba(139, 92, 246, 0.2);
 }
 
 #selectFilter:focus {
   border-color: #a78bfa;
-  box-shadow:
-    0 0 0 3px rgba(139, 92, 246, 0.3),
-    0 4px 20px rgba(139, 92, 246, 0.3);
-  color: #f3e8ff;
+
+  box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.25);
 }
 
 #selectFilter option {
   background: #1e293b;
   color: #e2e8f0;
-  font-weight: 500;
+}
+
+/* ===========================
+   TABLE BODY
+=========================== */
+
+tbody td {
+  padding: 18px 16px;
+  text-align: center;
+
+  color: #e2e8f0;
+
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+tbody tr {
+  transition: 0.3s ease;
+}
+
+tbody tr:hover {
+  background: rgba(255, 255, 255, 0.03);
 }
 
 /* Status Badges */
@@ -288,6 +338,20 @@ form {
   border: none;
   border-radius: 12px;
   outline: none;
+  background: #1e293b;
+  color: #ffffff;
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+
+  font-size: 0.95rem;
+  outline: none;
+
+  transition: all 0.3s ease;
+}
+.input-group input:focus {
+  border-color: #38bdf8;
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
 }
 .resume-upload {
   grid-column: 1 / -1;

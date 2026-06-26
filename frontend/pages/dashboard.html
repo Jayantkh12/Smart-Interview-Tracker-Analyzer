@@ -66,7 +66,8 @@
             <span id="activeResume">No Resume Uploaded</span>
           </p>
           <p>
-            <strong>ATS Score:</strong> <span id="atsScore">Not Available</span>
+            <strong>ATS Score:</strong>
+            <span id="atsScore">Not Available</span>
           </p>
           <p>
             <strong>Last Updated:</strong>
@@ -96,9 +97,20 @@
       </section>
 
       <section class="card">
-        <h2>Upcoming Interviews</h2>
-        <div class="empty" id="upcomingInterviews">
-          No interviews scheduled yet.
+        <div class="section-header">
+          <h2>
+            <i class="fa-solid fa-calendar-check"></i>
+            Upcoming Interviews
+          </h2>
+
+          <span class="badge" id="interviewCount">0</span>
+        </div>
+
+        <div id="upcomingInterviews">
+          <div class="interview-empty">
+            <i class="fa-solid fa-calendar-xmark"></i>
+            <p>No interviews scheduled yet.</p>
+          </div>
         </div>
       </section>
 

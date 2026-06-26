@@ -41,9 +41,10 @@ async function loadResumeData() {
     const data = await response.json();
 
     document.getElementById("activeResume").textContent = data.activeResume;
-
+    document.getElementById("atsScore").textContent = data.atsScore
+      ? `${data.atsScore}/100`
+      : "--";
     document.getElementById("resumeLastUpdated").textContent = data.lastUpdated;
-
     document.getElementById("totalResumes").textContent = data.totalResumes;
   } catch (error) {
     console.error(error);
@@ -52,29 +53,94 @@ async function loadResumeData() {
 
 loadResumeData();
 
-applications.forEach((app) => {
-  const row = document.createElement("tr");
+async function loadRecentApplications() {
+  console.log("loadRecentApplications called");
+  try {
+    const response = await fetch(
+      `http://localhost:5500/api/dashboard/recent-applications/${user.id}`,
+    );
 
-  const companyCell = document.createElement("td");
-  companyCell.textContent = app.company_name;
+    const applications = await response.json();
+    console.log("Applications:", applications);
+    const tableBody = document.getElementById("applicationsTableBody");
 
-  const roleCell = document.createElement("td");
-  roleCell.textContent = app.role;
+    tableBody.innerHTML = "";
 
-  const statusCell = document.createElement("td");
-  statusCell.textContent = app.status;
+    if (applications.length === 0) {
+      tableBody.innerHTML = `
+        <tr>
+          <td colspan="4">No applications found</td>
+        </tr>
+      `;
+      return;
+    }
 
-  statusCell.classList.add(
-    `status-${app.status.toLowerCase().replace(/\s+/g, "-")}`,
-  );
+    applications.forEach((app) => {
+      tableBody.innerHTML += `
+        <tr>
+          <td>${app.company_name}</td>
+          <td>${app.role}</td>
+          <td>
+            <span class="status-badge">
+              ${app.status}
+            </span>
+          </td>
+          <td>
+            ${new Date(app.application_date).toLocaleDateString()}
+          </td>
+        </tr>
+      `;
+    });
+  } catch (error) {
+    console.error("Error loading recent applications:", error);
 
-  const dateCell = document.createElement("td");
-  dateCell.textContent = new Date(app.application_date).toLocaleDateString();
+    document.getElementById("applicationsTableBody").innerHTML = `
+      <tr>
+        <td colspan="4">Failed to load applications</td>
+      </tr>
+    `;
+  }
+}
+loadRecentApplications();
 
-  row.appendChild(companyCell);
-  row.appendChild(roleCell);
-  row.appendChild(statusCell);
-  row.appendChild(dateCell);
+// Upcoming Interviews
+async function loadUpcomingInterviews() {
+  try {
+    const response = await fetch(
+      `http://localhost:5500/api/dashboard/upcoming-interviews/${user.id}`,
+    );
 
-  tbody.appendChild(row);
-});
+    const interviews = await response.json();
+
+    const container = document.getElementById("upcomingInterviews");
+
+    if (interviews.length === 0) {
+      container.innerHTML =
+        "<div class='empty'>No interviews scheduled yet.</div>";
+      return;
+    }
+
+    container.innerHTML = interviews
+      .map(
+        (interview) => `
+        <div class="interview-item">
+          <div>
+            <strong>${interview.company_name}</strong>
+            <p>${interview.role}</p>
+          </div>
+
+          <div>
+            <span>${interview.round_type}</span>
+            <br>
+            <small>
+              ${new Date(interview.round_date).toLocaleDateString()}
+            </small>
+          </div>
+        </div>
+      `,
+      )
+      .join("");
+  } catch (error) {
+    console.error(error);
+  }
+}
