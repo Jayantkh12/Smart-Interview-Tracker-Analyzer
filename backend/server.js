@@ -4,12 +4,17 @@ const cors = require("cors");
 const db = require("./config/db");
 const app = express();
 const bcrypt = require("bcryptjs");
+const multer = require("multer");
+const path = require("path");
+const fs = require("fs");
 
 // JSON data receive karne ke liye
 app.use(express.json());
 
 // Frontend ko request allow karne ke liye
 app.use(cors());
+
+app.use(express.urlencoded({ extended: true }));
 
 app.get("/api/dashboard/stats", async (req, res) => {
   const [applications] = await db.query(
@@ -563,6 +568,137 @@ app.delete("/api/application/:applicationId", async (req, res) => {
     });
   } catch (error) {
     console.log(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
+    });
+  }
+});
+
+//PROFILE
+
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
+const uploadDir = path.join(__dirname, "uploads", "profile");
+
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, uploadDir);
+  },
+
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname);
+    const fileName =
+      "user_" + Date.now() + "_" + Math.floor(Math.random() * 10000) + ext;
+
+    cb(null, fileName);
+  },
+});
+
+const fileFilter = (req, file, cb) => {
+  const allowedTypes = ["image/jpeg", "image/jpg", "image/png"];
+
+  if (allowedTypes.includes(file.mimetype)) {
+    cb(null, true);
+  } else {
+    cb(new Error("Only JPG, JPEG and PNG images are allowed."));
+  }
+};
+
+const upload = multer({
+  storage,
+  fileFilter,
+  limits: {
+    fileSize: 5 * 1024 * 1024,
+  },
+});
+
+//Upload Profile Image API
+app.post("/api/profile/upload", upload.single("profile"), async (req, res) => {
+  try {
+    const { userId } = req.body;
+
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        message: "User ID is required.",
+      });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: "No image selected.",
+      });
+    }
+
+    // Get previous image
+    const [rows] = await db.query(
+      "SELECT profile_photo FROM Users WHERE id=?",
+      [userId],
+    );
+
+    // Delete old image
+    if (
+      rows.length &&
+      rows[0].profile_photo &&
+      fs.existsSync(path.join(uploadDir, rows[0].profile_photo))
+    ) {
+      fs.unlinkSync(path.join(uploadDir, rows[0].profile_photo));
+    }
+
+    // Update database
+    await db.query("UPDATE Users SET profile_photo=? WHERE id=?", [
+      req.file.filename,
+      userId,
+    ]);
+
+    res.json({
+      success: true,
+      message: "Profile picture uploaded successfully.",
+      filename: req.file.filename,
+      imageUrl: "http://localhost:5500/uploads/profile/" + req.file.filename,
+    });
+  } catch (err) {
+    console.log(err);
+
+    res.status(500).json({
+      success: false,
+      message: "Upload failed.",
+    });
+  }
+});
+
+//Get Profile API
+app.get("/api/profile/:userId", async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const [rows] = await db.query(
+      "SELECT name,email,profile_photo FROM Users WHERE id=?",
+      [userId],
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found.",
+      });
+    }
+
+    res.json({
+      success: true,
+      name: rows[0].name,
+      email: rows[0].email,
+      profilePic: rows[0].profile_photo,
+    });
+  } catch (err) {
+    console.log(err);
 
     res.status(500).json({
       success: false,
