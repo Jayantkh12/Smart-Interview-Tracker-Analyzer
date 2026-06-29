@@ -1,0 +1,14 @@
+# Environment Variables (NEVER commit this)
+.env
+backend/.env
+
+# Node Modules
+node_modules/
+backend/node_modules/
+
+# Uploaded Files
+backend/uploads/
+
+# OS Files
+.DS_Store
+Thumbs.db

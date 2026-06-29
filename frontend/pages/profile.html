@@ -269,7 +269,7 @@
         <h2><i class="fa-solid fa-gear"></i> Account Settings</h2>
 
         <div class="settings-buttons">
-          <button class="change-btn" type="button">
+          <button class="change-btn" id="changePassBtn" type="button">
             <i class="fa-solid fa-key"></i>
             Change Password
           </button>
@@ -287,6 +287,90 @@
         <i class="fa-solid fa-floppy-disk"></i>
         Save Profile
       </button>
+    </div>
+
+    <!-- ── Change Password Modal ── -->
+    <div class="modal-overlay" id="changePassModal">
+      <div class="modal-box">
+        <div class="modal-header">
+          <h3><i class="fa-solid fa-key"></i> Change Password</h3>
+          <button class="modal-close" id="closeModalBtn" aria-label="Close">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <div class="input-group">
+            <label><i class="fa-solid fa-lock"></i> Current Password</label>
+            <div class="pass-input-wrap">
+              <input type="password" id="currentPass" placeholder="Enter current password" />
+              <button type="button" class="toggle-eye" data-target="currentPass"><i class="fa-solid fa-eye"></i></button>
+            </div>
+          </div>
+
+          <div class="input-group">
+            <label><i class="fa-solid fa-lock-open"></i> New Password</label>
+            <div class="pass-input-wrap">
+              <input type="password" id="newPass" placeholder="Enter new password" />
+              <button type="button" class="toggle-eye" data-target="newPass"><i class="fa-solid fa-eye"></i></button>
+            </div>
+          </div>
+
+          <div class="input-group">
+            <label><i class="fa-solid fa-shield-halved"></i> Confirm Password</label>
+            <div class="pass-input-wrap">
+              <input type="password" id="confirmPass" placeholder="Confirm new password" />
+              <button type="button" class="toggle-eye" data-target="confirmPass"><i class="fa-solid fa-eye"></i></button>
+            </div>
+          </div>
+
+          <p id="changePassStatus" class="modal-status" style="display:none"></p>
+        </div>
+
+        <div class="modal-footer">
+          <button class="modal-cancel-btn" id="cancelPassBtn" type="button">Cancel</button>
+          <button class="modal-save-btn" id="submitPassBtn" type="button">
+            <i class="fa-solid fa-floppy-disk"></i> Update Password
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Delete Account Modal ── -->
+    <div class="modal-overlay" id="deleteAccModal">
+      <div class="modal-box modal-danger">
+        <div class="modal-header">
+          <h3><i class="fa-solid fa-triangle-exclamation"></i> Delete Account</h3>
+          <button class="modal-close" id="closeDeleteModalBtn" aria-label="Close">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <p class="delete-warning">
+            ⚠️ This action is <strong>permanent</strong> and cannot be undone. All your applications, interviews, and data will be deleted forever.
+          </p>
+
+          <div class="input-group">
+            <label><i class="fa-solid fa-lock"></i> Enter your password to confirm</label>
+            <div class="pass-input-wrap">
+              <input type="password" id="deleteConfirmPass" placeholder="Enter your password" />
+              <button type="button" class="toggle-eye" data-target="deleteConfirmPass">
+                <i class="fa-solid fa-eye"></i>
+              </button>
+            </div>
+          </div>
+
+          <p id="deleteAccStatus" class="modal-status" style="display:none"></p>
+        </div>
+
+        <div class="modal-footer">
+          <button class="modal-cancel-btn" id="cancelDeleteBtn" type="button">Cancel</button>
+          <button class="modal-delete-btn" id="submitDeleteBtn" type="button">
+            <i class="fa-solid fa-trash"></i> Delete My Account
+          </button>
+        </div>
+      </div>
     </div>
 
     <script src="../js/dataService.js"></script>

@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const nodemailer = require("nodemailer");
 const cors = require("cors");
@@ -54,8 +55,8 @@ const transporter = nodemailer.createTransport({
   service: "gmail",
 
   auth: {
-    user: "jayantkh12@gmail.com",
-    pass: "izjm zjgm xcio tkop",
+    user: process.env.GMAIL_USER,
+    pass: process.env.GMAIL_PASS,
   },
 });
 //FORM
@@ -67,7 +68,7 @@ app.post("/contact", async (req, res) => {
     await transporter.sendMail({
       from: email,
 
-      to: "YOUR_GMAIL@gmail.com",
+      to: process.env.GMAIL_USER,
 
       subject: subject,
 
@@ -170,6 +171,68 @@ app.post("/login", async (req, res) => {
       success: false,
       message: "Server Error",
     });
+  }
+});
+// Change Password
+app.put("/api/change-password", async (req, res) => {
+  try {
+    const { userId, currentPassword, newPassword } = req.body;
+
+    const [users] = await db.query("SELECT * FROM Users WHERE id = ?", [userId]);
+
+    if (users.length === 0) {
+      return res.status(404).json({ success: false, message: "User not found." });
+    }
+
+    const isMatch = await bcrypt.compare(currentPassword, users[0].password);
+
+    if (!isMatch) {
+      return res.status(401).json({ success: false, message: "Current password is incorrect." });
+    }
+
+    const hashed = await bcrypt.hash(newPassword, 10);
+
+    await db.query("UPDATE Users SET password = ? WHERE id = ?", [hashed, userId]);
+
+    res.json({ success: true, message: "Password updated successfully." });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ success: false, message: "Server Error" });
+  }
+});
+
+// Delete Account
+app.delete("/api/user/:userId", async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { password } = req.body;
+
+    // Verify password first
+    const [users] = await db.query("SELECT * FROM Users WHERE id = ?", [userId]);
+
+    if (users.length === 0) {
+      return res.status(404).json({ success: false, message: "User not found." });
+    }
+
+    const isMatch = await bcrypt.compare(password, users[0].password);
+
+    if (!isMatch) {
+      return res.status(401).json({ success: false, message: "Incorrect password." });
+    }
+
+    // Delete in FK order
+    await db.query(`DELETE an FROM ApplicationNotes an JOIN Applications a ON an.application_id = a.application_id WHERE a.user_id = ?`, [userId]);
+    await db.query(`DELETE ir FROM InterviewRounds ir JOIN Applications a ON ir.application_id = a.application_id WHERE a.user_id = ?`, [userId]);
+    await db.query(`DELETE FROM Applications WHERE user_id = ?`, [userId]);
+    await db.query(`DELETE FROM Resumes WHERE user_id = ?`, [userId]);
+    await db.query(`DELETE FROM UserSkills WHERE user_id = ?`, [userId]);
+    await db.query(`DELETE FROM QuestionPractice WHERE user_id = ?`, [userId]);
+    await db.query(`DELETE FROM Users WHERE id = ?`, [userId]);
+
+    res.json({ success: true, message: "Account deleted successfully." });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ success: false, message: "Server Error" });
   }
 });
 
@@ -658,11 +721,12 @@ app.post("/api/profile/upload", upload.single("profile"), async (req, res) => {
       userId,
     ]);
 
+    const baseUrl = process.env.BASE_URL || `http://localhost:${process.env.PORT || 5500}`;
     res.json({
       success: true,
       message: "Profile picture uploaded successfully.",
       filename: req.file.filename,
-      imageUrl: "http://localhost:5500/uploads/profile/" + req.file.filename,
+      imageUrl: `${baseUrl}/uploads/profile/${req.file.filename}`,
     });
   } catch (err) {
     console.log(err);
@@ -674,13 +738,113 @@ app.post("/api/profile/upload", upload.single("profile"), async (req, res) => {
   }
 });
 
-//Get Profile API
+// ─── Resume Upload ────────────────────────────────────────────
+
+const resumeUploadDir = path.join(__dirname, "uploads", "resumes");
+
+if (!fs.existsSync(resumeUploadDir)) {
+  fs.mkdirSync(resumeUploadDir, { recursive: true });
+}
+
+const resumeStorage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, resumeUploadDir),
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname);
+    cb(null, "resume_" + Date.now() + "_" + Math.floor(Math.random() * 10000) + ext);
+  },
+});
+
+const resumeFilter = (req, file, cb) => {
+  const allowed = [
+    "application/pdf",
+    "application/msword",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  ];
+  if (allowed.includes(file.mimetype)) {
+    cb(null, true);
+  } else {
+    cb(new Error("Only PDF, DOC and DOCX files are allowed."));
+  }
+};
+
+const uploadResume = multer({
+  storage: resumeStorage,
+  fileFilter: resumeFilter,
+  limits: { fileSize: 5 * 1024 * 1024 },
+});
+
+// Upload Resume API
+app.post("/api/resume/upload", uploadResume.single("resume"), async (req, res) => {
+  try {
+    const { userId, resumeTitle } = req.body;
+
+    if (!userId) {
+      return res.status(400).json({ success: false, message: "User ID is required." });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: "No file selected." });
+    }
+
+    const title = resumeTitle || req.file.originalname;
+    const today = new Date().toISOString().slice(0, 10);
+
+    await db.query(
+      `INSERT INTO Resumes (user_id, resume_title, resume_file, upload_date) VALUES (?, ?, ?, ?)`,
+      [userId, title, req.file.filename, today],
+    );
+
+    const baseUrl = process.env.BASE_URL || `http://localhost:${process.env.PORT || 5500}`;
+
+    res.json({
+      success: true,
+      message: "Resume uploaded successfully.",
+      resumeTitle: title,
+      resumeUrl: `${baseUrl}/uploads/resumes/${req.file.filename}`,
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ success: false, message: "Server Error" });
+  }
+});
+
+// Get Latest Resume API
+app.get("/api/resume/:userId", async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const [rows] = await db.query(
+      `SELECT resume_id, resume_title, resume_file, upload_date
+       FROM Resumes WHERE user_id = ?
+       ORDER BY upload_date DESC, resume_id DESC LIMIT 1`,
+      [userId],
+    );
+
+    if (rows.length === 0) {
+      return res.json({ success: false, message: "No resume found." });
+    }
+
+    const baseUrl = process.env.BASE_URL || `http://localhost:${process.env.PORT || 5500}`;
+
+    res.json({
+      success: true,
+      resumeTitle: rows[0].resume_title,
+      resumeUrl: `${baseUrl}/uploads/resumes/${rows[0].resume_file}`,
+      uploadDate: rows[0].upload_date,
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ success: false, message: "Server Error" });
+  }
+});
+
+// Get Profile API — returns all profile fields
 app.get("/api/profile/:userId", async (req, res) => {
   try {
     const { userId } = req.params;
 
     const [rows] = await db.query(
-      "SELECT name,email,profile_photo FROM Users WHERE id=?",
+      "SELECT name, email, phoneNo, profile_photo, college, branch, graduation_year, preferred_role, expected_package, preferred_location, work_type FROM Users WHERE id=?",
       [userId],
     );
 
@@ -691,22 +855,52 @@ app.get("/api/profile/:userId", async (req, res) => {
       });
     }
 
+    const baseUrl = process.env.BASE_URL || `http://localhost:${process.env.PORT || 5500}`;
+
     res.json({
       success: true,
       name: rows[0].name,
       email: rows[0].email,
-      profilePic: rows[0].profile_photo,
+      phone: rows[0].phoneNo,
+      college: rows[0].college || "",
+      branch: rows[0].branch || "",
+      graduationYear: rows[0].graduation_year || "",
+      preferredRole: rows[0].preferred_role || "",
+      expectedPackage: rows[0].expected_package || "",
+      preferredLocation: rows[0].preferred_location || "",
+      workType: rows[0].work_type || "",
+      profilePic: rows[0].profile_photo
+        ? `${baseUrl}/uploads/profile/${rows[0].profile_photo}`
+        : null,
     });
   } catch (err) {
     console.log(err);
-
-    res.status(500).json({
-      success: false,
-      message: "Server Error",
-    });
+    res.status(500).json({ success: false, message: "Server Error" });
   }
 });
 
-app.listen(5500, () => {
-  console.log("Server running on port 5500");
+// Update Profile API — saves all profile fields including career preferences
+app.put("/api/profile/:userId", async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { name, phone, college, branch, graduationYear, preferredRole, expectedPackage, preferredLocation, workType } = req.body;
+
+    await db.query(
+      `UPDATE Users SET name=?, phoneNo=?, college=?, branch=?, graduation_year=?,
+       preferred_role=?, expected_package=?, preferred_location=?, work_type=? WHERE id=?`,
+      [name, phone, college, branch, graduationYear || null,
+       preferredRole || null, expectedPackage || null, preferredLocation || null, workType || null,
+       userId],
+    );
+
+    res.json({ success: true, message: "Profile updated successfully." });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ success: false, message: "Server Error" });
+  }
+});
+
+const PORT = process.env.PORT || 5500;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });

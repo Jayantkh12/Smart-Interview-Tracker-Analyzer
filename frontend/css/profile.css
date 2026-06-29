@@ -298,17 +298,52 @@ ul {
 .skills {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 16px;
+  margin-bottom: 6px;
 }
 
-.skills span {
+/* Each skill badge */
+.skill-tag {
+  position: relative;
   background: #0f172a;
   border: 1px solid #334155;
   color: #38bdf8;
-  padding: 8px 16px;
+  padding: 8px 20px 8px 14px;
   border-radius: 30px;
   font-size: 14px;
   font-weight: 500;
+  transition: border-color 0.2s;
+}
+
+.skill-tag:hover {
+  border-color: #38bdf8;
+}
+
+/* X button — top-right corner */
+.skill-tag button {
+  position: absolute;
+  top: -7px;
+  right: -7px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #ef4444;
+  border: none;
+  color: white;
+  font-size: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s, transform 0.2s;
+  transform: scale(0.8);
+  line-height: 1;
+}
+
+.skill-tag:hover button {
+  opacity: 1;
+  transform: scale(1);
 }
 
 .add-skill-box {
@@ -460,12 +495,231 @@ ul {
   color: #ef4444;
 }
 
+/* ─── Change Password Modal ─────────────────────────────────── */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(4px);
+  z-index: 2000;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-overlay.active {
+  display: flex;
+}
+
+.modal-box {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 18px;
+  width: 100%;
+  max-width: 440px;
+  margin: 16px;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
+  animation: modalSlideIn 0.25s ease;
+}
+
+@keyframes modalSlideIn {
+  from { opacity: 0; transform: translateY(-20px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0)    scale(1);    }
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid #334155;
+}
+
+.modal-header h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #38bdf8;
+}
+
+.modal-header h3 i {
+  margin-right: 8px;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: 0.2s;
+}
+
+.modal-close:hover {
+  background: #334155;
+  color: white;
+}
+
+.modal-body {
+  padding: 22px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Password input with eye toggle */
+.pass-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.pass-input-wrap input {
+  width: 100%;
+  padding: 12px 44px 12px 12px;
+  border-radius: 8px;
+  border: 1px solid #334155;
+  background: #0f172a;
+  color: white;
+  font-size: 15px;
+  transition: border-color 0.2s;
+}
+
+.pass-input-wrap input:focus {
+  outline: none;
+  border-color: #38bdf8;
+  box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.18);
+}
+
+.pass-input-wrap input::placeholder {
+  color: #94a3b8;
+}
+
+.toggle-eye {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  font-size: 0.95rem;
+  padding: 4px;
+  transition: color 0.2s;
+}
+
+.toggle-eye:hover {
+  color: #38bdf8;
+}
+
+/* Modal status message */
+.modal-status {
+  font-size: 0.88rem;
+  font-weight: 500;
+  padding: 10px 14px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 16px 24px 20px;
+  border-top: 1px solid #334155;
+}
+
+.modal-cancel-btn {
+  padding: 11px 22px;
+  border-radius: 8px;
+  border: 1px solid #475569;
+  background: transparent;
+  color: #cbd5e1;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.modal-cancel-btn:hover {
+  background: #334155;
+  color: white;
+}
+
+.modal-save-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 22px;
+  border-radius: 8px;
+  border: none;
+  background: #2563eb;
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.modal-save-btn:hover {
+  background: #1d4ed8;
+}
+
+.modal-save-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 /* Auth form error */
 .form-error {
   color: #f87171;
   font-size: 0.87rem;
   margin-top: 8px;
   text-align: center;
+}
+
+/* ─── Delete Account Modal ───────────────────────────────────── */
+.modal-danger {
+  border-color: rgba(239, 68, 68, 0.4);
+}
+
+.modal-danger .modal-header h3 {
+  color: #f87171;
+}
+
+.delete-warning {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 10px;
+  color: #fca5a5;
+  padding: 14px 16px;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.delete-warning strong {
+  color: #f87171;
+}
+
+.modal-delete-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 22px;
+  border-radius: 8px;
+  border: none;
+  background: #dc2626;
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.modal-delete-btn:hover {
+  background: #b91c1c;
+}
+
+.modal-delete-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 /* Mobile */
