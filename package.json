@@ -1,6 +1,16 @@
 {
+  "name": "smart-interview-tracker",
+  "version": "1.0.0",
+  "description": "Smart Interview Tracker & Analyzer",
+  "scripts": {
+    "start": "node backend/server.js",
+    "dev": "node backend/server.js"
+  },
   "dependencies": {
+    "bcryptjs": "^3.0.3",
     "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.1.0",
     "multer": "^2.2.0",
     "mysql2": "^3.22.5",
     "nodemailer": "^9.0.1"
