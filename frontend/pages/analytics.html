@@ -8,7 +8,6 @@
       name="description"
       content="View your interview analytics, status breakdown, monthly trends, and top companies on Smart Interview Tracker."
     />
-
     <link rel="stylesheet" href="../css/analytics.css" />
     <link
       rel="stylesheet"
@@ -38,75 +37,146 @@
     </nav>
 
     <main class="container">
-      <h1><i class="fa-solid fa-chart-line"></i> Analytics</h1>
+
+      <!-- ── Page Header ── -->
+      <div class="page-header">
+        <div>
+          <h1><i class="fa-solid fa-chart-line"></i> Analytics</h1>
+          <p class="page-subtitle">Deep insights into your job search journey</p>
+        </div>
+        <div class="header-actions">
+          <select id="timeFilter" class="filter-select" aria-label="Time period filter">
+            <option value="all">All Time</option>
+            <option value="3">Last 3 Months</option>
+            <option value="6" selected>Last 6 Months</option>
+            <option value="12">Last 12 Months</option>
+          </select>
+          <button id="exportBtn" class="export-btn" type="button">
+            <i class="fa-solid fa-download"></i> Export CSV
+          </button>
+        </div>
+      </div>
 
       <!-- ── Headline Stats ── -->
       <section class="stats-grid" aria-label="Analytics headline statistics">
-        <div class="stat-card">
-          <i class="fa-solid fa-layer-group"></i>
-          <h3>Total Applications</h3>
-          <p id="analyticsTotal">0</p>
+
+        <div class="stat-card animate-in" style="--delay:0.05s">
+          <div class="stat-icon-wrap icon-blue">
+            <i class="fa-solid fa-layer-group"></i>
+          </div>
+          <div class="stat-info">
+            <h3>Total Applications</h3>
+            <p id="analyticsTotal" class="stat-value">—</p>
+          </div>
         </div>
 
-        <div class="stat-card">
-          <i class="fa-solid fa-calendar-check"></i>
-          <h3>Interviews</h3>
-          <p id="analyticsInterviews">0</p>
+        <div class="stat-card animate-in" style="--delay:0.1s">
+          <div class="stat-icon-wrap icon-purple">
+            <i class="fa-solid fa-calendar-check"></i>
+          </div>
+          <div class="stat-info">
+            <h3>Interviews Scheduled</h3>
+            <p id="analyticsInterviews" class="stat-value">—</p>
+          </div>
         </div>
 
-        <div class="stat-card">
-          <i class="fa-solid fa-trophy"></i>
-          <h3>Offers</h3>
-          <p id="analyticsOffers">0</p>
+        <div class="stat-card animate-in" style="--delay:0.15s">
+          <div class="stat-icon-wrap icon-green">
+            <i class="fa-solid fa-trophy"></i>
+          </div>
+          <div class="stat-info">
+            <h3>Offers / Selected</h3>
+            <p id="analyticsOffers" class="stat-value">—</p>
+          </div>
         </div>
 
-        <div class="stat-card">
-          <i class="fa-solid fa-circle-xmark"></i>
-          <h3>Rejected</h3>
-          <p id="analyticsRejected">0</p>
+        <div class="stat-card animate-in" style="--delay:0.2s">
+          <div class="stat-icon-wrap icon-red">
+            <i class="fa-solid fa-circle-xmark"></i>
+          </div>
+          <div class="stat-info">
+            <h3>Rejected</h3>
+            <p id="analyticsRejected" class="stat-value">—</p>
+          </div>
         </div>
 
-        <div class="stat-card">
-          <i class="fa-solid fa-arrow-trend-up"></i>
-          <h3>Offer Rate</h3>
-          <p id="conversionRate">0%</p>
+        <div class="stat-card animate-in" style="--delay:0.25s">
+          <div class="stat-icon-wrap icon-orange">
+            <i class="fa-solid fa-arrow-trend-up"></i>
+          </div>
+          <div class="stat-info">
+            <h3>Offer Rate</h3>
+            <p id="conversionRate" class="stat-value">—</p>
+          </div>
         </div>
 
-        <div class="stat-card">
-          <i class="fa-solid fa-comments"></i>
-          <h3>Interview Rate</h3>
-          <p id="interviewRate">0%</p>
+        <div class="stat-card animate-in" style="--delay:0.3s">
+          <div class="stat-icon-wrap icon-teal">
+            <i class="fa-solid fa-comments"></i>
+          </div>
+          <div class="stat-info">
+            <h3>Interview Rate</h3>
+            <p id="interviewRate" class="stat-value">—</p>
+          </div>
         </div>
 
-        <div class="stat-card">
-          <i class="fa-solid fa-clock"></i>
-          <h3>Avg. Days to Interview</h3>
-          <p id="avgDaysToInterview">N/A</p>
+        <div class="stat-card animate-in" style="--delay:0.35s">
+          <div class="stat-icon-wrap icon-yellow">
+            <i class="fa-solid fa-clock"></i>
+          </div>
+          <div class="stat-info">
+            <h3>Avg. Days to Interview</h3>
+            <p id="avgDaysToInterview" class="stat-value">—</p>
+          </div>
         </div>
+
+        <div class="stat-card animate-in" style="--delay:0.4s">
+          <div class="stat-icon-wrap icon-indigo">
+            <i class="fa-solid fa-code"></i>
+          </div>
+          <div class="stat-info">
+            <h3>OA Cleared</h3>
+            <p id="analyticsOACleared" class="stat-value">—</p>
+          </div>
+        </div>
+
       </section>
 
-      <!-- ── Status Breakdown ── -->
-      <section class="card">
-        <h2><i class="fa-solid fa-chart-pie"></i> Status Breakdown</h2>
-        <div
-          id="statusBreakdown"
-          class="breakdown-list"
-          aria-label="Application status breakdown"
-        >
-          <p class="empty">Loading…</p>
-        </div>
-      </section>
+      <!-- ── Charts Row 1: Donut + Monthly Bar ── -->
+      <div class="charts-row">
 
-      <!-- ── Applications Per Month ── -->
+        <!-- Status Donut Chart -->
+        <section class="card chart-card">
+          <h2><i class="fa-solid fa-chart-pie"></i> Status Distribution</h2>
+          <div class="donut-wrap">
+            <canvas id="statusDonutChart" aria-label="Status distribution donut chart"></canvas>
+            <div class="donut-center">
+              <span id="donutCenterCount">0</span>
+              <small>Total</small>
+            </div>
+          </div>
+          <ul class="donut-legend" id="donutLegend"></ul>
+        </section>
+
+        <!-- Monthly Bar Chart -->
+        <section class="card chart-card flex-2">
+          <h2><i class="fa-solid fa-calendar-days"></i> Applications Per Month</h2>
+          <div class="canvas-wrap">
+            <canvas id="monthlyBarChart" aria-label="Monthly applications bar chart"></canvas>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- ── Interview Rounds Bar Chart ── -->
       <section class="card">
-        <h2><i class="fa-solid fa-calendar"></i> Applications Per Month</h2>
-        <div
-          id="monthlyChart"
-          class="bar-chart"
-          aria-label="Monthly application bar chart"
-        >
-          <p class="empty">Loading…</p>
+        <h2><i class="fa-solid fa-layer-group"></i> Interview Rounds Breakdown</h2>
+        <div class="canvas-wrap canvas-md">
+          <canvas id="roundsBarChart" aria-label="Interview rounds breakdown chart"></canvas>
         </div>
+        <p id="noRoundsMsg" class="empty" style="display:none">
+          No interview round data recorded yet.
+        </p>
       </section>
 
       <!-- ── Top Companies ── -->
@@ -121,6 +191,7 @@
         </div>
       </section>
 
+
       <!-- ── Interview Questions Log ── -->
       <section class="card">
         <h2>
@@ -134,9 +205,11 @@
           <p class="empty">Loading…</p>
         </div>
       </section>
+
     </main>
 
-    <script src="../js/dataService.js"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
     <script src="../js/analytics.js"></script>
   </body>
 </html>

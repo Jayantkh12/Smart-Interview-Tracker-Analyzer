@@ -4,15 +4,13 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dashboard | Smart Interview Tracker</title>
-
+    <meta name="description" content="Your personal interview tracking dashboard — stats, recent applications, upcoming interviews, and quick actions." />
     <link rel="stylesheet" href="../css/dashboard.css" />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
-    />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
   </head>
 
   <body>
+    <!-- ── Navbar ── -->
     <nav class="navbar">
       <div class="logo">
         <i class="fa-solid fa-briefcase"></i>
@@ -23,150 +21,280 @@
         <i class="fa-solid fa-bars"></i>
       </button>
 
-      <ul class="nav-links">
-        <li><a href="dashboard.html">Dashboard</a></li>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="dashboard.html" class="active">Dashboard</a></li>
         <li><a href="applications.html">Applications</a></li>
         <li><a href="analytics.html">Analytics</a></li>
         <li><a href="profile.html">Profile</a></li>
-        <li><a href="../index.html">Logout</a></li>
+        <li><a href="../index.html" id="logoutBtn">Logout</a></li>
       </ul>
     </nav>
 
     <main class="container">
-      <h1 class="welcome" id="welcomeMessage">Welcome Back</h1>
 
+      <!-- ── Welcome Header ── -->
+      <div class="welcome-header">
+        <div>
+          <h1 id="welcomeMessage">Welcome Back 👋</h1>
+          <p class="welcome-sub" id="welcomeDate"></p>
+        </div>
+        <a href="applications.html" class="add-btn">
+          <i class="fa-solid fa-plus"></i> Add Application
+        </a>
+      </div>
+
+      <!-- ── Stat Cards ── -->
       <section class="stats-grid" aria-label="Dashboard statistics">
-        <div class="stat-card">
-          <h3>Total Applications</h3>
-          <p id="dashboardTotalApplications">0</p>
+
+        <div class="stat-card animate-in" style="--delay:0.05s">
+          <div class="stat-icon-wrap icon-blue">
+            <i class="fa-solid fa-layer-group"></i>
+          </div>
+          <div class="stat-info">
+            <p class="stat-label">Total Applications</p>
+            <p class="stat-value" id="dashboardTotalApplications">—</p>
+          </div>
+          <div class="stat-trend" id="trendTotal"></div>
         </div>
 
-        <div class="stat-card">
-          <h3>Interviews</h3>
-          <p id="dashboardInterviews">0</p>
-        </div>
-
-        <div class="stat-card">
-          <h3>Offers</h3>
-          <p id="dashboardOffers">0</p>
-        </div>
-
-        <div class="stat-card">
-          <h3>Rejections</h3>
-          <p id="dashboardRejections">0</p>
-        </div>
-      </section>
-
-      <section class="card">
-        <h2>Resume Management</h2>
-
-        <div class="info">
-          <p>
-            <strong>Active Resume:</strong>
-            <span id="activeResume">No Resume Uploaded</span>
-          </p>
-          <p>
-            <strong>ATS Score:</strong>
-            <span id="atsScore">Not Available</span>
-          </p>
-          <p>
-            <strong>Last Updated:</strong>
-            <span id="resumeLastUpdated">--</span>
-          </p>
-          <p>
-            <strong>Total Resumes:</strong> <span id="totalResumes">0</span>
-          </p>
-        </div>
-      </section>
-
-      <section class="card">
-        <h2>Recent Applications</h2>
-
-        <table class="applications-table">
-          <thead>
-            <tr>
-              <th>Company</th>
-              <th>Role</th>
-              <th>Status</th>
-              <th>Date</th>
-            </tr>
-          </thead>
-
-          <tbody id="applicationsTableBody"></tbody>
-        </table>
-      </section>
-
-      <section class="card">
-        <div class="section-header">
-          <h2>
+        <div class="stat-card animate-in" style="--delay:0.1s">
+          <div class="stat-icon-wrap icon-purple">
             <i class="fa-solid fa-calendar-check"></i>
-            Upcoming Interviews
-          </h2>
-
-          <span class="badge" id="interviewCount">0</span>
-        </div>
-
-        <div id="upcomingInterviews">
-          <div class="interview-empty">
-            <i class="fa-solid fa-calendar-xmark"></i>
-            <p>No interviews scheduled yet.</p>
+          </div>
+          <div class="stat-info">
+            <p class="stat-label">Interviews</p>
+            <p class="stat-value" id="dashboardInterviews">—</p>
           </div>
         </div>
-      </section>
 
-      <section class="card">
-        <h2>Interview Questions Analysis</h2>
-        <div class="empty" id="questionAnalysis">
-          No interview data available.
+        <div class="stat-card animate-in" style="--delay:0.15s">
+          <div class="stat-icon-wrap icon-green">
+            <i class="fa-solid fa-trophy"></i>
+          </div>
+          <div class="stat-info">
+            <p class="stat-label">Offers / Selected</p>
+            <p class="stat-value" id="dashboardOffers">—</p>
+          </div>
         </div>
-      </section>
 
-      <section class="card">
-        <h2>Recently Asked Questions</h2>
-        <div class="empty" id="recentQuestions">No questions recorded yet.</div>
-      </section>
-
-      <section class="card">
-        <h2>Resume Usage Analytics</h2>
-        <div class="empty" id="resumeAnalytics">
-          Upload resumes to view analytics.
+        <div class="stat-card animate-in" style="--delay:0.2s">
+          <div class="stat-icon-wrap icon-red">
+            <i class="fa-solid fa-circle-xmark"></i>
+          </div>
+          <div class="stat-info">
+            <p class="stat-label">Rejections</p>
+            <p class="stat-value" id="dashboardRejections">—</p>
+          </div>
         </div>
+
       </section>
 
-      <section class="card">
-        <h2>Difficulty Breakdown</h2>
+      <!-- ── Main Grid: Left (Recent Apps + Upcoming) | Right (Resume + Quick Actions) ── -->
+      <div class="dashboard-grid">
 
-        <div class="difficulty">
-          <span>Easy : <span id="difficultyEasy">0</span></span>
-          <span>Medium : <span id="difficultyMedium">0</span></span>
-          <span>Hard : <span id="difficultyHard">0</span></span>
+        <!-- LEFT COLUMN -->
+        <div class="dashboard-left">
+
+          <!-- Recent Applications -->
+          <section class="card">
+            <div class="card-header">
+              <h2><i class="fa-solid fa-clock-rotate-left"></i> Recent Applications</h2>
+              <a href="applications.html" class="view-all-link">View All <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+
+            <div class="table-wrap">
+              <table class="applications-table" aria-label="Recent applications">
+                <thead>
+                  <tr>
+                    <th>Company</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                  </tr>
+                </thead>
+                <tbody id="applicationsTableBody">
+                  <tr><td colspan="4" class="table-loading">Loading…</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <!-- Upcoming Interviews -->
+          <section class="card">
+            <div class="card-header">
+              <h2><i class="fa-solid fa-calendar-check"></i> Upcoming Interviews</h2>
+              <span class="badge" id="interviewCount">0</span>
+            </div>
+            <div id="upcomingInterviews">
+              <div class="empty-state">
+                <i class="fa-solid fa-calendar-xmark"></i>
+                <p>No interviews scheduled yet.</p>
+              </div>
+            </div>
+          </section>
+
+          <!-- Interview Questions Analysis -->
+          <section class="card">
+            <h2><i class="fa-solid fa-magnifying-glass-chart"></i> Interview Questions Analysis</h2>
+            <div id="questionAnalysis" class="empty">
+              No interview data available.
+            </div>
+          </section>
+
+          <!-- Recently Asked Questions -->
+          <section class="card">
+            <h2><i class="fa-solid fa-clipboard-question"></i> Recently Asked Questions</h2>
+            <div id="recentQuestions" class="questions-log-dash">
+              <p class="empty">No questions recorded yet.</p>
+            </div>
+          </section>
+
+          <!-- Resume Usage Analytics -->
+          <section class="card">
+            <h2><i class="fa-solid fa-chart-pie"></i> Resume Usage Analytics</h2>
+            <div id="resumeAnalytics" class="empty">
+              Upload resumes to view analytics.
+            </div>
+          </section>
+
+          <!-- Difficulty Breakdown -->
+          <section class="card">
+            <h2><i class="fa-solid fa-signal"></i> Difficulty Breakdown</h2>
+            <div class="difficulty-wrap">
+              <div class="diff-item diff-easy">
+                <span class="diff-label">Easy</span>
+                <span class="diff-count" id="difficultyEasy">0</span>
+              </div>
+              <div class="diff-item diff-medium">
+                <span class="diff-label">Medium</span>
+                <span class="diff-count" id="difficultyMedium">0</span>
+              </div>
+              <div class="diff-item diff-hard">
+                <span class="diff-label">Hard</span>
+                <span class="diff-count" id="difficultyHard">0</span>
+              </div>
+            </div>
+          </section>
+
         </div>
-      </section>
 
-      <section class="card">
-        <h2>Quick Actions</h2>
+        <!-- RIGHT COLUMN -->
+        <div class="dashboard-right">
 
-        <div class="actions">
-          <button type="button" data-href="applications.html">
-            + Add Application
-          </button>
-          <button type="button" data-href="applications.html">
-            + Schedule Interview
-          </button>
-          <button type="button" data-href="applications.html">
-            + Add Questions Asked
-          </button>
-          <button type="button" data-href="profile.html">
-            + Upload Resume
-          </button>
-          <button type="button" data-href="profile.html">
-            + Switch Resume
-          </button>
+          <!-- Resume Card -->
+          <section class="card resume-card">
+            <h2><i class="fa-solid fa-file-lines"></i> Active Resume</h2>
+            <div class="resume-info">
+              <div class="resume-icon">
+                <i class="fa-solid fa-file-pdf"></i>
+              </div>
+              <div class="resume-details">
+                <p class="resume-name" id="activeResume">No Resume Uploaded</p>
+                <p class="resume-meta">Last updated: <span id="resumeLastUpdated">—</span></p>
+                <p class="resume-meta">Total resumes: <span id="totalResumes">0</span></p>
+              </div>
+            </div>
+            <a href="profile.html" class="resume-upload-btn">
+              <i class="fa-solid fa-upload"></i> Manage Resumes
+            </a>
+          </section>
+
+          <!-- Quick Actions -->
+          <section class="card">
+            <h2><i class="fa-solid fa-bolt"></i> Quick Actions</h2>
+            <div class="actions-grid">
+              <a href="applications.html" class="action-btn action-blue">
+                <i class="fa-solid fa-plus"></i>
+                <span>Add Application</span>
+              </a>
+              <a href="analytics.html" class="action-btn action-purple">
+                <i class="fa-solid fa-chart-line"></i>
+                <span>View Analytics</span>
+              </a>
+              <a href="profile.html" class="action-btn action-green">
+                <i class="fa-solid fa-upload"></i>
+                <span>Upload Resume</span>
+              </a>
+              <button type="button" id="openAddQuestionBtn" class="action-btn action-teal">
+                <i class="fa-solid fa-circle-question"></i>
+                <span>Add Question</span>
+              </button>
+            </div>
+          </section>
+
+
         </div>
-      </section>
+      </div>
+
     </main>
 
-    <script src="../js/dataService.js"></script>
+    <!-- ── Add Interview Question Modal ── -->
+    <div class="modal-overlay" id="questionModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal-box">
+
+        <div class="modal-header">
+          <h2 id="modalTitle"><i class="fa-solid fa-circle-question"></i> Add Interview Question</h2>
+          <button class="modal-close" id="closeModalBtn" aria-label="Close modal">&times;</button>
+        </div>
+
+        <form id="addQuestionForm" novalidate>
+
+          <!-- Question Text -->
+          <div class="form-group">
+            <label for="qText">Question <span class="req">*</span></label>
+            <textarea id="qText" name="qText" rows="3" placeholder="e.g. Find the longest substring without repeating characters…" required></textarea>
+          </div>
+
+          <!-- Topic -->
+          <div class="form-group">
+            <label for="qTopic">Topic</label>
+            <input id="qTopic" name="qTopic" type="text" placeholder="e.g. Arrays, System Design, DP…" />
+          </div>
+
+          <!-- Difficulty Pills -->
+          <div class="form-group">
+            <label>Difficulty <span class="req">*</span></label>
+            <div class="diff-pills">
+              <label class="pill pill-easy">
+                <input type="radio" name="difficulty" value="Easy" required />
+                <span><i class="fa-solid fa-circle-check"></i> Easy</span>
+              </label>
+              <label class="pill pill-medium">
+                <input type="radio" name="difficulty" value="Medium" />
+                <span><i class="fa-solid fa-triangle-exclamation"></i> Medium</span>
+              </label>
+              <label class="pill pill-hard">
+                <input type="radio" name="difficulty" value="Hard" />
+                <span><i class="fa-solid fa-skull"></i> Hard</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Company (optional) -->
+          <div class="form-group">
+            <label for="qCompany">Company (optional)</label>
+            <input id="qCompany" name="qCompany" type="text" placeholder="e.g. Google, Amazon…" />
+          </div>
+
+          <!-- Notes (optional) -->
+          <div class="form-group">
+            <label for="qNotes">Your Answer / Notes (optional)</label>
+            <textarea id="qNotes" name="qNotes" rows="2" placeholder="Write your approach or key points…"></textarea>
+          </div>
+
+          <div class="modal-actions">
+            <button type="button" id="cancelModalBtn" class="btn-cancel">Cancel</button>
+            <button type="submit" id="saveQuestionBtn" class="btn-save">
+              <i class="fa-solid fa-floppy-disk"></i> Save Question
+            </button>
+          </div>
+
+        </form>
+      </div>
+    </div>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
     <script src="../js/dashboard.js"></script>
   </body>
 </html>

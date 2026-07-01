@@ -900,6 +900,263 @@ app.put("/api/profile/:userId", async (req, res) => {
   }
 });
 
+// ─── Analytics Routes ─────────────────────────────────────────────────────────
+
+/**
+ * Helper: builds a date filter clause if ?months=N is provided.
+ * Returns { clause: string, params: Array }
+ */
+function dateFilter(months, dateCol) {
+  if (!months || isNaN(months) || +months <= 0) return { clause: "", params: [] };
+  return {
+    clause: `AND ${dateCol} >= DATE_SUB(CURDATE(), INTERVAL ? MONTH)`,
+    params: [+months],
+  };
+}
+
+// GET /api/analytics/stats/:userId?months=N
+// Returns total, applied, interview, offers, rejected, oaCleared, avgDays
+app.get("/api/analytics/stats/:userId", async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { clause, params } = dateFilter(req.query.months, "a.application_date");
+
+    const [totals] = await db.query(
+      `SELECT
+         COUNT(*) AS total,
+         SUM(a.status = 'Applied') AS applied,
+         SUM(a.status = 'Interview Scheduled') AS interview,
+         SUM(a.status = 'Selected') AS offers,
+         SUM(a.status = 'Rejected') AS rejected,
+         SUM(a.status = 'OA Cleared') AS oaCleared
+       FROM Applications a
+       WHERE a.user_id = ? ${clause}`,
+      [userId, ...params],
+    );
+
+    const [avgRow] = await db.query(
+      `SELECT AVG(DATEDIFF(ir.round_date, a.application_date)) AS avgDays
+       FROM Applications a
+       JOIN InterviewRounds ir ON ir.application_id = a.application_id
+       WHERE a.user_id = ?
+         AND ir.round_date IS NOT NULL
+         AND ir.round_date >= a.application_date
+         ${clause}`,
+      [userId, ...params],
+    );
+
+    const row = totals[0] || {};
+    res.json({
+      total:     +row.total     || 0,
+      applied:   +row.applied   || 0,
+      interview: +row.interview || 0,
+      offers:    +row.offers    || 0,
+      rejected:  +row.rejected  || 0,
+      oaCleared: +row.oaCleared || 0,
+      avgDays:   avgRow[0]?.avgDays != null ? Math.round(avgRow[0].avgDays) : null,
+    });
+  } catch (err) {
+    console.error("[analytics/stats]", err);
+    res.status(500).json({ success: false, message: "Server Error" });
+  }
+});
+
+// GET /api/analytics/monthly/:userId?months=N
+// Returns [{month: "2026-05", count: 3}, …] for the last N months
+app.get("/api/analytics/monthly/:userId", async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const months = +req.query.months || 6;
+
+    const [rows] = await db.query(
+      `SELECT
+         DATE_FORMAT(application_date, '%Y-%m') AS month,
+         COUNT(*) AS count
+       FROM Applications
+       WHERE user_id = ?
+         AND application_date >= DATE_SUB(CURDATE(), INTERVAL ? MONTH)
+       GROUP BY month
+       ORDER BY month ASC`,
+      [userId, months],
+    );
+
+    res.json(rows.map(r => ({ month: r.month, count: +r.count })));
+  } catch (err) {
+    console.error("[analytics/monthly]", err);
+    res.status(500).json({ success: false, message: "Server Error" });
+  }
+});
+
+// GET /api/analytics/top-companies/:userId?months=N
+// Returns [{company, count}, …] top 8 companies
+app.get("/api/analytics/top-companies/:userId", async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { clause, params } = dateFilter(req.query.months, "a.application_date");
+
+    const [rows] = await db.query(
+      `SELECT c.company_name AS company, COUNT(*) AS count
+       FROM Applications a
+       JOIN Companies c ON a.company_id = c.company_id
+       WHERE a.user_id = ? ${clause}
+       GROUP BY c.company_name
+       ORDER BY count DESC
+       LIMIT 8`,
+      [userId, ...params],
+    );
+
+    res.json(rows.map(r => ({ company: r.company, count: +r.count })));
+  } catch (err) {
+    console.error("[analytics/top-companies]", err);
+    res.status(500).json({ success: false, message: "Server Error" });
+  }
+});
+
+// GET /api/analytics/rounds/:userId?months=N
+// Returns [{round_type, count}, …] interview round type breakdown
+app.get("/api/analytics/rounds/:userId", async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { clause, params } = dateFilter(req.query.months, "a.application_date");
+
+    const [rows] = await db.query(
+      `SELECT ir.round_type, COUNT(*) AS count
+       FROM InterviewRounds ir
+       JOIN Applications a ON ir.application_id = a.application_id
+       WHERE a.user_id = ? ${clause}
+       GROUP BY ir.round_type
+       ORDER BY count DESC`,
+      [userId, ...params],
+    );
+
+    res.json(rows.map(r => ({ round_type: r.round_type, count: +r.count })));
+  } catch (err) {
+    console.error("[analytics/rounds]", err);
+    res.status(500).json({ success: false, message: "Server Error" });
+  }
+});
+
+// GET /api/analytics/questions/:userId?months=N
+// Returns [{company_name, role, questions_asked, next_round_prep}, …]
+app.get("/api/analytics/questions/:userId", async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { clause, params } = dateFilter(req.query.months, "a.application_date");
+
+    const [rows] = await db.query(
+      `SELECT
+         c.company_name,
+         a.role,
+         n.note_text AS questions_asked,
+         '' AS next_round_prep
+       FROM Applications a
+       JOIN Companies c ON a.company_id = c.company_id
+       LEFT JOIN ApplicationNotes n ON a.application_id = n.application_id
+       WHERE a.user_id = ?
+         AND n.note_text IS NOT NULL
+         AND n.note_text != ''
+         ${clause}
+       ORDER BY a.application_date DESC`,
+      [userId, ...params],
+    );
+
+    res.json(rows);
+  } catch (err) {
+    console.error("[analytics/questions]", err);
+    res.status(500).json({ success: false, message: "Server Error" });
+  }
+});
+
+// GET /api/analytics/oa-cleared/:userId?months=N
+app.get("/api/analytics/oa-cleared/:userId", async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { clause, params } = dateFilter(req.query.months, "a.application_date");
+
+    const [rows] = await db.query(
+      `SELECT COUNT(*) AS count
+       FROM Applications a
+       WHERE a.user_id = ?
+         AND a.status = 'OA Cleared'
+         ${clause}`,
+      [userId, ...params],
+    );
+
+    res.json({ count: +rows[0].count });
+  } catch (err) {
+    console.error("[analytics/oa-cleared]", err);
+    res.status(500).json({ success: false, message: "Server Error" });
+  }
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+// POST /api/questions/add
+// Body: { userId, questionText, topic, difficulty, company, notes }
+app.post("/api/questions/add", async (req, res) => {
+  try {
+    const { userId, questionText, topic, difficulty, company, notes } = req.body;
+
+    if (!userId || !questionText || !difficulty) {
+      return res.status(400).json({ success: false, message: "Missing required fields" });
+    }
+
+    // Build the full question text (embed company + notes if provided)
+    let fullText = questionText;
+    if (company) fullText += `\n[Company: ${company}]`;
+    if (notes)   fullText += `\n[Notes: ${notes}]`;
+
+    // 1. Insert question into Questions table
+    const [result] = await db.query(
+      `INSERT INTO Questions (question_text, topic, difficulty)
+       VALUES (?, ?, ?)`,
+      [fullText, topic || "General", difficulty],
+    );
+
+    const questionId = result.insertId;
+
+    // 2. Link to user in QuestionPractice (mark as encountered/solved)
+    await db.query(
+      `INSERT INTO QuestionPractice (user_id, question_id, solved)
+       VALUES (?, ?, 1)`,
+      [userId, questionId],
+    );
+
+    res.json({ success: true, questionId });
+  } catch (err) {
+    console.error("[questions/add]", err);
+    res.status(500).json({ success: false, message: "Server Error" });
+  }
+});
+
+// GET /api/dashboard/difficulty/:userId
+
+// Returns { easy, medium, hard } count of solved questions by difficulty
+app.get("/api/dashboard/difficulty/:userId", async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const [rows] = await db.query(
+      `SELECT q.difficulty, COUNT(*) AS count
+       FROM QuestionPractice qp
+       JOIN Questions q ON qp.question_id = q.question_id
+       WHERE qp.user_id = ? AND qp.solved = 1
+       GROUP BY q.difficulty`,
+      [userId],
+    );
+    const result = { easy: 0, medium: 0, hard: 0 };
+    rows.forEach(r => {
+      const key = (r.difficulty || "").toLowerCase();
+      if (key === "easy")   result.easy   = +r.count;
+      if (key === "medium") result.medium = +r.count;
+      if (key === "hard")   result.hard   = +r.count;
+    });
+    res.json(result);
+  } catch (err) {
+    console.error("[dashboard/difficulty]", err);
+    res.status(500).json({ success: false, message: "Server Error" });
+  }
+});
+
 const PORT = process.env.PORT || 5500;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
