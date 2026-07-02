@@ -37,15 +37,20 @@
     </nav>
 
     <main class="container">
-
       <!-- ── Page Header ── -->
       <div class="page-header">
         <div>
           <h1><i class="fa-solid fa-chart-line"></i> Analytics</h1>
-          <p class="page-subtitle">Deep insights into your job search journey</p>
+          <p class="page-subtitle">
+            Deep insights into your job search journey
+          </p>
         </div>
         <div class="header-actions">
-          <select id="timeFilter" class="filter-select" aria-label="Time period filter">
+          <select
+            id="timeFilter"
+            class="filter-select"
+            aria-label="Time period filter"
+          >
             <option value="all">All Time</option>
             <option value="3">Last 3 Months</option>
             <option value="6" selected>Last 6 Months</option>
@@ -59,8 +64,7 @@
 
       <!-- ── Headline Stats ── -->
       <section class="stats-grid" aria-label="Analytics headline statistics">
-
-        <div class="stat-card animate-in" style="--delay:0.05s">
+        <div class="stat-card animate-in" style="--delay: 0.05s">
           <div class="stat-icon-wrap icon-blue">
             <i class="fa-solid fa-layer-group"></i>
           </div>
@@ -70,7 +74,7 @@
           </div>
         </div>
 
-        <div class="stat-card animate-in" style="--delay:0.1s">
+        <div class="stat-card animate-in" style="--delay: 0.1s">
           <div class="stat-icon-wrap icon-purple">
             <i class="fa-solid fa-calendar-check"></i>
           </div>
@@ -80,7 +84,7 @@
           </div>
         </div>
 
-        <div class="stat-card animate-in" style="--delay:0.15s">
+        <div class="stat-card animate-in" style="--delay: 0.15s">
           <div class="stat-icon-wrap icon-green">
             <i class="fa-solid fa-trophy"></i>
           </div>
@@ -90,7 +94,7 @@
           </div>
         </div>
 
-        <div class="stat-card animate-in" style="--delay:0.2s">
+        <div class="stat-card animate-in" style="--delay: 0.2s">
           <div class="stat-icon-wrap icon-red">
             <i class="fa-solid fa-circle-xmark"></i>
           </div>
@@ -100,7 +104,7 @@
           </div>
         </div>
 
-        <div class="stat-card animate-in" style="--delay:0.25s">
+        <div class="stat-card animate-in" style="--delay: 0.25s">
           <div class="stat-icon-wrap icon-orange">
             <i class="fa-solid fa-arrow-trend-up"></i>
           </div>
@@ -110,7 +114,7 @@
           </div>
         </div>
 
-        <div class="stat-card animate-in" style="--delay:0.3s">
+        <div class="stat-card animate-in" style="--delay: 0.3s">
           <div class="stat-icon-wrap icon-teal">
             <i class="fa-solid fa-comments"></i>
           </div>
@@ -120,7 +124,7 @@
           </div>
         </div>
 
-        <div class="stat-card animate-in" style="--delay:0.35s">
+        <div class="stat-card animate-in" style="--delay: 0.35s">
           <div class="stat-icon-wrap icon-yellow">
             <i class="fa-solid fa-clock"></i>
           </div>
@@ -130,7 +134,7 @@
           </div>
         </div>
 
-        <div class="stat-card animate-in" style="--delay:0.4s">
+        <div class="stat-card animate-in" style="--delay: 0.4s">
           <div class="stat-icon-wrap icon-indigo">
             <i class="fa-solid fa-code"></i>
           </div>
@@ -139,17 +143,18 @@
             <p id="analyticsOACleared" class="stat-value">—</p>
           </div>
         </div>
-
       </section>
 
       <!-- ── Charts Row 1: Donut + Monthly Bar ── -->
       <div class="charts-row">
-
         <!-- Status Donut Chart -->
         <section class="card chart-card">
           <h2><i class="fa-solid fa-chart-pie"></i> Status Distribution</h2>
           <div class="donut-wrap">
-            <canvas id="statusDonutChart" aria-label="Status distribution donut chart"></canvas>
+            <canvas
+              id="statusDonutChart"
+              aria-label="Status distribution donut chart"
+            ></canvas>
             <div class="donut-center">
               <span id="donutCenterCount">0</span>
               <small>Total</small>
@@ -160,21 +165,30 @@
 
         <!-- Monthly Bar Chart -->
         <section class="card chart-card flex-2">
-          <h2><i class="fa-solid fa-calendar-days"></i> Applications Per Month</h2>
+          <h2>
+            <i class="fa-solid fa-calendar-days"></i> Applications Per Month
+          </h2>
           <div class="canvas-wrap">
-            <canvas id="monthlyBarChart" aria-label="Monthly applications bar chart"></canvas>
+            <canvas
+              id="monthlyBarChart"
+              aria-label="Monthly applications bar chart"
+            ></canvas>
           </div>
         </section>
-
       </div>
 
       <!-- ── Interview Rounds Bar Chart ── -->
       <section class="card">
-        <h2><i class="fa-solid fa-layer-group"></i> Interview Rounds Breakdown</h2>
+        <h2>
+          <i class="fa-solid fa-layer-group"></i> Interview Rounds Breakdown
+        </h2>
         <div class="canvas-wrap canvas-md">
-          <canvas id="roundsBarChart" aria-label="Interview rounds breakdown chart"></canvas>
+          <canvas
+            id="roundsBarChart"
+            aria-label="Interview rounds breakdown chart"
+          ></canvas>
         </div>
-        <p id="noRoundsMsg" class="empty" style="display:none">
+        <p id="noRoundsMsg" class="empty" style="display: none">
           No interview round data recorded yet.
         </p>
       </section>
@@ -191,7 +205,6 @@
         </div>
       </section>
 
-
       <!-- ── Interview Questions Log ── -->
       <section class="card">
         <h2>
@@ -205,7 +218,6 @@
           <p class="empty">Loading…</p>
         </div>
       </section>
-
     </main>
 
     <!-- Chart.js CDN -->

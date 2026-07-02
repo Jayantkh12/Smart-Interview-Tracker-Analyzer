@@ -278,12 +278,16 @@ loginForm?.addEventListener("submit", async (e) => {
       const serializedUser = JSON.stringify(data.user);
 
       if (rememberMeInput?.checked) {
+        localStorage.setItem("token", data.token);
         localStorage.setItem("user", serializedUser);
         localStorage.setItem(REMEMBERED_EMAIL_KEY, email);
         sessionStorage.removeItem("user");
+        sessionStorage.removeItem("token");
       } else {
+        sessionStorage.setItem("token", data.token);
         sessionStorage.setItem("user", serializedUser);
         localStorage.removeItem("user");
+        localStorage.removeItem("token");
         localStorage.removeItem(REMEMBERED_EMAIL_KEY);
       }
 

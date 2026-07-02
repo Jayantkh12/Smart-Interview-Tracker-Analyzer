@@ -33,12 +33,12 @@ Smart Interview Tracker & Analyzer is designed to provide a centralized platform
 - Update Interview Status
 - Store Interview Feedback
 
-### 📊 Analytics Dashboard
+### 📊 Analytics Dashboard & Reporting
 
-- Total Applications
-- Interview Success Rate
-- Application Statistics
-- Progress Tracking
+- Real-time headline metrics: Total Applications, Interviews, Offers, Rejections
+- Rate indicators: Offer Rate, Interview Rate, OA Cleared rate, and Avg. Days to Interview
+- Interactive Chart.js Visuals: Status Distribution donut, Monthly Application bar, and Rounds Breakdown bar
+- **📄 Premium PDF Export**: Download a custom, multi-page print-friendly PDF performance report complete with active metrics, pipeline listings, charts, and interview prep logs.
 
 ### 📁 Resume Management
 
@@ -69,7 +69,7 @@ Smart Interview Tracker & Analyzer is designed to provide a centralized platform
 
 ### Database
 
-- MongoDB / SQL Database
+- MySQL Database
 
 ### Authentication
 
@@ -90,40 +90,64 @@ Smart-Interview-Tracker-Analyzer
 │   ├── config
 │   │   └── db.js
 │   ├── models
-│   │   ├── User.js
 │   │   ├── Company.js
+│   │   ├── Feedback.js
 │   │   ├── Interview.js
-│   │   └── Feedback.js
+│   │   └── User.js
 │   ├── routes
 │   │   ├── authRoutes.js
-│   │   ├── interviewRoutes.js
-│   │   └── companyRoutes.js
+│   │   ├── companyRoutes.js
+│   │   └── interviewRoutes.js
 │   ├── controllers
 │   │   ├── authController.js
-│   │   ├── interviewController.js
-│   │   └── companyController.js
+│   │   ├── companyController.js
+│   │   └── interviewController.js
 │   ├── middleware
 │   │   └── authMiddleware.js
 │   ├── uploads
 │   │   └── resumes
+│   ├── check_db.js
+│   ├── .env
 │   ├── server.js
 │   └── package.json
 │
 ├── frontend
 │   ├── css
-│   │   ├── style.css
+│   │   ├── addInterview.css
+│   │   ├── analytics.css
+│   │   ├── applications.css
 │   │   ├── dashboard.css
-│   │   └── login.css
+│   │   ├── login.css
+│   │   ├── pages.css
+│   │   ├── profile.css
+│   │   ├── register.css
+│   │   └── style.css
 │   ├── js
+│   │   ├── addInterview.js
+│   │   ├── analytics.js
 │   │   ├── app.js
+│   │   ├── applications.js
 │   │   ├── dashboard.js
-│   │   └── analytics.js
+│   │   ├── dataService.js
+│   │   ├── login.js
+│   │   ├── profile.js
+│   │   └── register.js
 │   ├── pages
-│   │   ├── login.html
-│   │   ├── register.html
-│   │   ├── dashboard.html
 │   │   ├── addInterview.html
-│   │   └── analytics.html
+│   │   ├── analytics.html
+│   │   ├── applications.html
+│   │   ├── blog.html
+│   │   ├── cookies.html
+│   │   ├── dashboard.html
+│   │   ├── disclaimer.html
+│   │   ├── documentation.html
+│   │   ├── faq.html
+│   │   ├── login.html
+│   │   ├── pricing.html
+│   │   ├── privacy.html
+│   │   ├── profile.html
+│   │   ├── register.html
+│   │   └── terms.html
 │   ├── assets
 │   │   ├── images
 │   │   └── icons
@@ -139,6 +163,7 @@ Smart-Interview-Tracker-Analyzer
 │   ├── ER_Diagram.png
 │   └── Project_Report.docx
 │
+├── setup.py
 └── README.md
 ```
 
@@ -170,9 +195,19 @@ npm install
 Create a `.env` file inside the backend folder:
 
 ```env
-PORT=5000
-MONGO_URI=your_database_connection_string
-JWT_SECRET=your_secret_key
+MYSQL_HOST=localhost
+MYSQL_USER=root
+MYSQL_PASSWORD=your_mysql_password
+MYSQL_DATABASE=Project
+MYSQL_PORT=3306
+PORT=5500
+
+# Gmail (Contact Form)
+GMAIL_USER=your_email@gmail.com
+GMAIL_PASS=your_app_password
+
+# Backend Base URL
+BASE_URL=http://localhost:5500
 ```
 
 ### Run Server

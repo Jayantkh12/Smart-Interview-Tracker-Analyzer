@@ -1,3 +1,21 @@
+// Global fetch interceptor to append JWT Authorization header
+(function() {
+  const originalFetch = window.fetch;
+  window.fetch = async function(resource, init) {
+    init = init || {};
+    init.headers = init.headers || {};
+    const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+    if (token) {
+      if (init.headers instanceof Headers) {
+        init.headers.set("Authorization", `Bearer ${token}`);
+      } else {
+        init.headers["Authorization"] = `Bearer ${token}`;
+      }
+    }
+    return originalFetch(resource, init);
+  };
+})();
+
 // ============================================================
 // analytics.js – Smart Interview Tracker & Analyzer
 // ============================================================

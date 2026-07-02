@@ -93,6 +93,7 @@ registerForm?.addEventListener("submit", async (e) => {
     const data = await response.json();
 
     if (data.success) {
+      localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user || { id: data.userId, name, email }));
       showToast("✅ Registration successful! Welcome aboard.", "success");
       
