@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Privacy Policy | Smart Interview Tracker</title>
+    <meta name="description" content="Read our privacy policy to understand how we secure your resume data and login credentials." />
+    <link rel="stylesheet" href="../css/pages.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    />
+  </head>
+  <body>
+    <!-- ── Navbar ── -->
+    <nav class="navbar" id="navbar">
+      <div class="logo">
+        <i class="fa-solid fa-briefcase"></i>
+        <span>InterviewTracker</span>
+      </div>
+
+      <button class="menu-btn" id="menuBtn" aria-label="Toggle navigation">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+
+      <ul class="nav-links" id="navLinks">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="../index.html#features">Features</a></li>
+        <li><a href="../index.html#about">About</a></li>
+        <li><a href="../index.html#contact">Contact</a></li>
+        <li><a href="login.html">Login</a></li>
+        <li><a href="register.html" class="register-btn">Register</a></li>
+      </ul>
+    </nav>
+
+    <!-- ── Main Section ── -->
+    <main class="container">
+      <section class="about-section">
+        
+        <!-- Header -->
+        <div class="about-header animate-in" style="--delay:0s">
+          <div class="section-badge">
+            <i class="fa-solid fa-shield-halved"></i> Security Guard
+          </div>
+          <h1>Privacy Policy</h1>
+          <p>
+            Effective Date: July 1, 2026. Learn how we handle your personal data and file storage.
+          </p>
+        </div>
+
+        <!-- Content Card -->
+        <div class="mission-section animate-in" style="--delay:0.1s">
+          <div class="card mission-card" style="text-align:left">
+            <h2 style="justify-content:flex-start"><i class="fa-solid fa-database"></i> 1. Information We Collect</h2>
+            <p style="margin-bottom:20px">
+              We collect information you provide directly to us when creating accounts, uploading active resume PDFs, logging companies, setting salary packages, and writing preparation round notes. This details email, name, phone, password credentials, and dashboard inputs.
+            </p>
+
+            <h2 style="justify-content:flex-start"><i class="fa-solid fa-lock"></i> 2. How We Secure Your Data</h2>
+            <p style="margin-bottom:20px">
+              We implement encrypted authorization profiles on all queries. Resumes uploaded on our workspace profile are stored in secure folder repositories protected against external leaks.
+            </p>
+
+            <h2 style="justify-content:flex-start"><i class="fa-solid fa-user-check"></i> 3. Sharing and Disclosures</h2>
+            <p>
+              Smart Interview Tracker does not trade or lease candidate data. Information is strictly utilized to aggregate statistics and display personal analytical curves in your account profile.
+            </p>
+          </div>
+        </div>
+
+      </section>
+    </main>
+
+    <!-- ── Footer ── -->
+    <footer class="footer">
+      <div class="footer-content">
+        <div class="footer-brand">
+          <div class="footer-logo">
+            <i class="fa-solid fa-briefcase"></i>
+            <span>InterviewTracker</span>
+          </div>
+          <p>Smart Interview Tracker &amp; Analyzer for students and job seekers. Track every application, ace every interview.</p>
+          <div class="social-wrapper">
+            <span class="social-title">Follow Us</span>
+            <div class="social-icons">
+              <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+              <a href="#" aria-label="GitHub"><i class="fab fa-github"></i></a>
+              <a href="#" aria-label="Twitter"><i class="fab fa-x-twitter"></i></a>
+              <a href="mailto:jayantkumar2901@gmail.com" aria-label="Email"><i class="fa-solid fa-envelope"></i></a>
+            </div>
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <h4>Product</h4>
+          <a href="dashboard.html">Dashboard</a>
+          <a href="analytics.html">Analytics</a>
+          <a href="profile.html">Resume AI</a>
+          <a href="pricing.html">Pricing</a>
+        </div>
+
+        <div class="footer-col">
+          <h4>Resources</h4>
+          <a href="documentation.html">Documentation</a>
+          <a href="faq.html">FAQ</a>
+          <a href="blog.html">Blog</a>
+          <a href="../index.html#contact">Support</a>
+        </div>
+
+        <div class="footer-col">
+          <h4>Legal</h4>
+          <a href="privacy.html">Privacy Policy</a>
+          <a href="terms.html">Terms of Service</a>
+          <a href="cookies.html">Cookie Policy</a>
+          <a href="disclaimer.html">Disclaimer</a>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>© 2026 Smart Interview Tracker &amp; Analyzer. All Rights Reserved.</p>
+      </div>
+    </footer>
+
+    <script>
+      const menuBtn = document.getElementById("menuBtn");
+      const navLinks = document.getElementById("navLinks");
+      menuBtn?.addEventListener("click", () => {
+        navLinks?.classList.toggle("active");
+      });
+    </script>
+  </body>
+</html>

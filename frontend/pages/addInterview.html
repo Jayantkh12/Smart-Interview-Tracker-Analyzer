@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Add Interview Round | Smart Interview Tracker</title>
+    <meta name="description" content="Log an interview round for one of your applications — track round type, date, and result." />
+    <link rel="stylesheet" href="../css/addInterview.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+  </head>
+
+  <body>
+    <!-- ── Navbar ── -->
+    <nav class="navbar">
+      <div class="logo">
+        <i class="fa-solid fa-briefcase"></i>
+        <span>InterviewTracker</span>
+      </div>
+
+      <button class="menu-btn" id="menuBtn" aria-label="Open navigation">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+
+      <ul class="nav-links" id="navLinks">
+        <li><a href="dashboard.html">Dashboard</a></li>
+        <li><a href="applications.html">Applications</a></li>
+        <li><a href="analytics.html">Analytics</a></li>
+        <li><a href="profile.html">Profile</a></li>
+        <li><a href="../index.html" id="logoutBtn">Logout</a></li>
+      </ul>
+    </nav>
+
+    <main class="container">
+
+      <!-- ── Page Header ── -->
+      <div class="page-header animate-in" style="--delay:0s">
+        <div class="page-header-left">
+          <a href="dashboard.html" class="back-btn">
+            <i class="fa-solid fa-arrow-left"></i>
+          </a>
+          <div>
+            <h1><i class="fa-solid fa-calendar-plus"></i> Add Interview Round</h1>
+            <p class="page-sub">Log an interview round for one of your applications</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Main Grid ── -->
+      <div class="add-interview-grid">
+
+        <!-- LEFT: Form -->
+        <section class="card form-card animate-in" style="--delay:0.08s">
+          <h2><i class="fa-solid fa-pen-to-square"></i> Round Details</h2>
+
+          <form id="addInterviewForm" novalidate>
+
+            <!-- Application Select -->
+            <div class="form-group">
+              <label for="applicationSelect">
+                Application <span class="req">*</span>
+              </label>
+              <div class="select-wrap">
+                <select id="applicationSelect" required>
+                  <option value="">— Select an application —</option>
+                </select>
+                <i class="fa-solid fa-chevron-down select-icon"></i>
+              </div>
+              <p class="field-hint" id="appHint"></p>
+            </div>
+
+            <!-- Round Type -->
+            <div class="form-group">
+              <label>Round Type <span class="req">*</span></label>
+              <div class="round-pills">
+                <label class="round-pill">
+                  <input type="radio" name="roundType" value="Online Assessment" required />
+                  <span><i class="fa-solid fa-laptop-code"></i> Online Assessment</span>
+                </label>
+                <label class="round-pill">
+                  <input type="radio" name="roundType" value="Technical" />
+                  <span><i class="fa-solid fa-code"></i> Technical</span>
+                </label>
+                <label class="round-pill">
+                  <input type="radio" name="roundType" value="HR" />
+                  <span><i class="fa-solid fa-user-tie"></i> HR</span>
+                </label>
+                <label class="round-pill">
+                  <input type="radio" name="roundType" value="Managerial" />
+                  <span><i class="fa-solid fa-building-user"></i> Managerial</span>
+                </label>
+                <label class="round-pill">
+                  <input type="radio" name="roundType" value="Group Discussion" />
+                  <span><i class="fa-solid fa-people-group"></i> Group Discussion</span>
+                </label>
+                <label class="round-pill">
+                  <input type="radio" name="roundType" value="Final" />
+                  <span><i class="fa-solid fa-flag-checkered"></i> Final</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Date -->
+            <div class="form-group">
+              <label for="roundDate">Interview Date</label>
+              <div class="input-icon-wrap">
+                <i class="fa-regular fa-calendar input-icon"></i>
+                <input id="roundDate" type="date" />
+              </div>
+            </div>
+
+            <!-- Result -->
+            <div class="form-group">
+              <label for="resultSelect">Result (if known)</label>
+              <div class="select-wrap">
+                <select id="resultSelect">
+                  <option value="">— Result not yet known —</option>
+                  <option value="Passed">✅ Passed</option>
+                  <option value="Failed">❌ Failed</option>
+                  <option value="Pending">⏳ Pending</option>
+                  <option value="Waitlisted">⏸ Waitlisted</option>
+                </select>
+                <i class="fa-solid fa-chevron-down select-icon"></i>
+              </div>
+            </div>
+
+            <!-- Update Application Status -->
+            <div class="form-group">
+              <label for="updateStatusSelect">Update Application Status</label>
+              <div class="select-wrap">
+                <select id="updateStatusSelect">
+                  <option value="">— Don't change status —</option>
+                  <option value="OA Cleared">OA Cleared</option>
+                  <option value="Interview Scheduled">Interview Scheduled</option>
+                  <option value="Selected">Selected 🎉</option>
+                  <option value="Rejected">Rejected</option>
+                </select>
+                <i class="fa-solid fa-chevron-down select-icon"></i>
+              </div>
+            </div>
+
+            <!-- Submit -->
+            <div class="form-actions">
+              <a href="dashboard.html" class="btn-cancel-link">
+                <i class="fa-solid fa-xmark"></i> Cancel
+              </a>
+              <button type="submit" id="submitBtn" class="btn-submit">
+                <i class="fa-solid fa-floppy-disk"></i> Save Interview Round
+              </button>
+            </div>
+
+          </form>
+        </section>
+
+        <!-- RIGHT: Summary + Tips -->
+        <div class="right-col">
+
+          <!-- Selected Application Info -->
+          <section class="card animate-in" style="--delay:0.14s" id="appInfoCard">
+            <h2><i class="fa-solid fa-building"></i> Application Info</h2>
+            <div id="appInfoBody" class="app-info-empty">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <p>Select an application to see details</p>
+            </div>
+          </section>
+
+          <!-- Tips -->
+          <section class="card tips-card animate-in" style="--delay:0.2s">
+            <h2><i class="fa-solid fa-lightbulb"></i> Interview Tips</h2>
+            <ul class="tips-list">
+              <li>
+                <i class="fa-solid fa-star tip-icon tip-yellow"></i>
+                <span>Research the company thoroughly before the round</span>
+              </li>
+              <li>
+                <i class="fa-solid fa-code tip-icon tip-blue"></i>
+                <span>Practice DSA problems on LeetCode / HackerRank</span>
+              </li>
+              <li>
+                <i class="fa-solid fa-comment-dots tip-icon tip-purple"></i>
+                <span>Prepare concise STAR-format behavioral answers</span>
+              </li>
+              <li>
+                <i class="fa-solid fa-clock tip-icon tip-green"></i>
+                <span>Log rounds immediately so you don't forget details</span>
+              </li>
+              <li>
+                <i class="fa-solid fa-clipboard-question tip-icon tip-teal"></i>
+                <span>Use "Add Question" to log questions asked in each round</span>
+              </li>
+            </ul>
+          </section>
+
+          <!-- Round Types Guide -->
+          <section class="card animate-in" style="--delay:0.26s">
+            <h2><i class="fa-solid fa-circle-info"></i> Round Types</h2>
+            <div class="round-guide">
+              <div class="rg-item">
+                <span class="rg-badge badge-oa">OA</span>
+                <span>Online Assessment — coding challenges, MCQs</span>
+              </div>
+              <div class="rg-item">
+                <span class="rg-badge badge-tech">Tech</span>
+                <span>Technical — live coding, DSA, system design</span>
+              </div>
+              <div class="rg-item">
+                <span class="rg-badge badge-hr">HR</span>
+                <span>HR — behaviorals, salary discussion</span>
+              </div>
+              <div class="rg-item">
+                <span class="rg-badge badge-mgr">Mgr</span>
+                <span>Managerial — team fit, leadership scenarios</span>
+              </div>
+            </div>
+          </section>
+
+        </div>
+      </div>
+
+    </main>
+
+    <!-- Toast -->
+    <div class="toast" id="globalToast"></div>
+
+    <script src="../js/addInterview.js"></script>
+  </body>
+</html>

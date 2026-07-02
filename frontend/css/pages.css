@@ -1,5 +1,5 @@
 /* ============================================================
-   register.css – Smart Interview Tracker
+   about.css – Smart Interview Tracker
    Premium dark glassmorphism design
 ============================================================ */
 
@@ -114,19 +114,14 @@ ul { list-style: none; }
   cursor: pointer;
 }
 
-/* ── Container ── */
+/* ── Container Layout ── */
 .container {
-  flex: 1;
   position: relative;
   z-index: 1;
   width: 90%;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 70px 0;
-  display: grid;
-  grid-template-columns: 1fr 480px;
-  gap: 60px;
-  align-items: center;
+  padding: 60px 0 80px;
 }
 
 /* ── Animate In ── */
@@ -153,247 +148,112 @@ ul { list-style: none; }
   font-weight: 600;
   margin-bottom: 18px;
 }
-.gradient-text {
-  background: linear-gradient(135deg, #6c63ff 20%, #38bdf8 80%);
+
+/* ── Header ── */
+.about-header {
+  text-align: center;
+  max-width: 700px;
+  margin: 0 auto 50px;
+}
+.about-header h1 {
+  font-size: 3.2rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #e2e8f0 30%, #94a3b8);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-}
-
-/* ── Left Panel ── */
-.left-panel h1 {
-  font-size: 3.5rem;
-  font-weight: 800;
-  line-height: 1.15;
-  color: #e2e8f0;
   margin-bottom: 20px;
   letter-spacing: -1px;
 }
-.left-panel p {
+.about-header p {
   color: #64748b;
-  font-size: 1.05rem;
   line-height: 1.8;
-  margin-bottom: 35px;
-  max-width: 520px;
+  font-size: 1.05rem;
 }
 
-/* Advantage Checks list */
-.advantage-list {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
+/* ── About Cards Grid ── */
+.about-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  margin-bottom: 50px;
 }
-.advantage-item {
+.about-card {
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.75), rgba(15, 23, 42, 0.75));
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(12px);
+  border-radius: 20px;
+  padding: 32px 28px;
+  transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
+}
+.about-card:hover {
+  transform: translateY(-5px);
+  border-color: rgba(108, 99, 255, 0.3);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+}
+
+.about-icon-wrap {
+  width: 48px; height: 48px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
-  gap: 12px;
-  font-size: 0.9rem;
-  color: #94a3b8;
-  font-weight: 500;
+  justify-content: center;
+  font-size: 1.25rem;
+  margin-bottom: 18px;
 }
-.advantage-item i {
-  color: #34d399;
+.icon-blue   { background: rgba(56, 189, 248, 0.15); color: #38bdf8; }
+.icon-purple { background: rgba(167, 139, 250, 0.15); color: #a78bfa; }
+.icon-green  { background: rgba(52, 211, 153, 0.15); color: #34d399; }
+.icon-orange { background: rgba(251, 146, 60, 0.15); color: #fb923c; }
+
+.about-card h3 {
   font-size: 1.1rem;
-  flex-shrink: 0;
+  font-weight: 700;
+  color: #f1f5f9;
+  margin-bottom: 10px;
+}
+.about-card p {
+  color: #64748b;
+  font-size: 0.88rem;
+  line-height: 1.7;
 }
 
-/* ── Register Card (Right side container) ── */
-.card {
+/* ── Mission Section ── */
+.mission-section {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+.mission-card {
   background: linear-gradient(135deg, rgba(30,41,59,0.75), rgba(15,23,42,0.75));
   border: 1px solid rgba(255,255,255,0.07);
   backdrop-filter: blur(12px);
   border-radius: 24px;
-  padding: 38px 34px;
+  padding: 38px;
+  max-width: 800px;
+  text-align: center;
   box-shadow: 0 20px 50px rgba(0,0,0,0.3);
-  transition: border-color 0.25s;
 }
-.card:hover { border-color: rgba(108,99,255,0.18); }
-
-.card h2 {
-  font-size: 1.6rem;
+.mission-card h2 {
+  font-size: 1.4rem;
   font-weight: 800;
-  color: #f1f5f9;
-  text-align: center;
-  margin-bottom: 6px;
-  letter-spacing: -0.5px;
-}
-.card .subtitle {
-  font-size: 0.86rem;
-  color: #64748b;
-  text-align: center;
-  margin-bottom: 28px;
-}
-
-/* Form groups & input wrapping */
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-bottom: 16px;
-}
-.form-group label {
-  font-size: 0.76rem;
-  font-weight: 600;
-  color: #64748b;
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
-}
-.req { color: #f87171; }
-
-.input-icon-wrap {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-.input-icon {
-  position: absolute;
-  left: 14px;
-  color: #475569;
-  font-size: 0.85rem;
-  pointer-events: none;
-  z-index: 1;
-}
-
-.input-icon-wrap input {
-  width: 100%;
-  background: rgba(15,23,42,0.7);
-  border: 1px solid rgba(255,255,255,0.09);
   color: #e2e8f0;
-  border-radius: 12px;
-  padding: 12px 14px 12px 38px;
-  font-size: 0.88rem;
-  font-family: "Poppins", sans-serif;
-  outline: none;
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-.input-icon-wrap input:focus {
-  border-color: #6c63ff;
-  box-shadow: 0 0 0 3px rgba(108,99,255,0.15);
-}
-.input-icon-wrap input::placeholder {
-  color: #334155;
-}
-
-/* ── Options / Checkbox / links ── */
-.options {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-  font-size: 0.86rem;
-  font-weight: 500;
-}
-
-/* Custom checkbox wrapper */
-.checkbox-container {
-  display: block;
-  position: relative;
-  padding-left: 24px;
-  cursor: pointer;
-  color: #94a3b8;
-  user-select: none;
-}
-.checkbox-container input {
-  position: absolute;
-  opacity: 0;
-  cursor: pointer;
-  height: 0; width: 0;
-}
-.checkmark {
-  position: absolute;
-  top: 1px; left: 0;
-  height: 16px; width: 16px;
-  background-color: rgba(15, 23, 42, 0.7);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 4px;
-  transition: background-color 0.2s, border-color 0.2s;
-}
-.checkbox-container:hover input ~ .checkmark {
-  border-color: #6c63ff;
-}
-.checkbox-container input:checked ~ .checkmark {
-  background-color: #6c63ff;
-  border-color: #6c63ff;
-}
-.checkmark:after {
-  content: "";
-  position: absolute;
-  display: none;
-}
-.checkbox-container input:checked ~ .checkmark:after {
-  display: block;
-}
-.checkbox-container .checkmark:after {
-  left: 5px; top: 2px;
-  width: 4px; height: 8px;
-  border: solid white;
-  border-width: 0 2px 2px 0;
-  transform: rotate(45deg);
-}
-
-.terms {
-  justify-content: flex-start;
-}
-.terms label {
-  align-items: flex-start;
-  line-height: 1.5;
-}
-
-/* ── Submit button ── */
-.submit-btn {
-  width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  background: linear-gradient(135deg, #6c63ff, #8b5cf6);
-  border: none;
-  color: #fff;
-  padding: 13px;
-  border-radius: 12px;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.mission-card h2 i {
+  background: linear-gradient(135deg, #6c63ff, #38bdf8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.mission-card p {
+  color: #94a3b8;
   font-size: 0.95rem;
-  font-weight: 700;
-  font-family: "Poppins", sans-serif;
-  cursor: pointer;
-  box-shadow: 0 4px 15px rgba(108, 99, 255, 0.35);
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-.submit-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(108, 99, 255, 0.5);
-}
-.submit-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none;
-}
-
-/* Form validation error */
-.form-error {
-  color: #f87171;
-  font-size: 0.82rem;
-  font-weight: 500;
-  text-align: center;
-  margin-top: 14px;
-  padding: 8px;
-  border-radius: 8px;
-  background: rgba(248,113,113,0.08);
-  border: 1px solid rgba(248,113,113,0.18);
-}
-
-.register-link {
-  margin-top: 24px;
-  text-align: center;
-  font-size: 0.86rem;
-  color: #64748b;
-}
-.register-link a {
-  color: #a78bfa;
-  font-weight: 600;
-  margin-left: 4px;
-}
-.register-link a:hover {
-  color: #c4b5fd;
+  line-height: 1.8;
 }
 
 /* ============================================================
@@ -410,7 +270,7 @@ ul { list-style: none; }
   display: grid;
   grid-template-columns: 2fr 1fr 1fr 1fr;
   gap: 48px;
-  padding: 60px 8% 40px;
+  padding: 72px 8% 48px;
   max-width: 1440px;
   margin: 0 auto;
 }
@@ -494,31 +354,6 @@ ul { list-style: none; }
   font-size: 0.82rem;
 }
 
-/* ── Toast ── */
-.toast {
-  position: fixed;
-  bottom: 28px; right: 28px;
-  background: #1e293b;
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 14px;
-  padding: 14px 22px;
-  font-size: 0.88rem;
-  font-weight: 600;
-  color: #e2e8f0;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-  z-index: 9999;
-  opacity: 0;
-  transform: translateY(20px);
-  transition: transform 0.3s, opacity 0.3s;
-  pointer-events: none;
-}
-.toast.show { opacity: 1; transform: translateY(0); }
-.toast.toast-success { border-left: 4px solid #34d399; }
-.toast.toast-error   { border-left: 4px solid #f87171; }
-
 /* ============================================================
    RESPONSIVE
 ============================================================ */
@@ -526,32 +361,13 @@ ul { list-style: none; }
   .footer-content { grid-template-columns: 1fr 1fr; gap: 32px; }
 }
 
-@media (max-width: 992px) {
-  .container {
+@media (max-width: 900px) {
+  .about-header h1 {
+    font-size: 2.7rem;
+  }
+  .about-grid {
     grid-template-columns: 1fr;
-    gap: 40px;
-    padding: 60px 4%;
-  }
-  .left-panel {
-    text-align: center;
-  }
-  .left-panel h1 {
-    font-size: 2.8rem;
-  }
-  .left-panel p {
-    margin-left: auto; margin-right: auto;
-  }
-  .advantage-list {
-    align-items: center;
-  }
-  .login-card-wrap {
-    display: flex;
-    justify-content: center;
-    width: 100%;
-  }
-  .card {
-    width: 100%;
-    max-width: 460px;
+    gap: 20px;
   }
 }
 
@@ -576,16 +392,11 @@ ul { list-style: none; }
   .nav-links a { width: 100%; }
   .register-btn { text-align: center; }
 
-  .left-panel h1 { font-size: 2.2rem; }
-  .card { padding: 34px 24px; }
+  .about-header h1 { font-size: 2.2rem; }
+  .mission-card { padding: 28px 22px; }
   .footer-content { grid-template-columns: 1fr; padding: 48px 5% 32px; }
 }
 
 @media (max-width: 480px) {
-  .left-panel h1 { font-size: 2rem; }
-  .options {
-    flex-direction: column;
-    gap: 12px;
-    align-items: flex-start;
-  }
+  .about-header h1 { font-size: 2rem; }
 }

@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Frequently Asked Questions | Smart Interview Tracker</title>
+    <meta name="description" content="Find answers to common questions about tracking applications, security, and using the dashboard." />
+    <link rel="stylesheet" href="../css/pages.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    />
+    <style>
+      .faq-list {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        max-width: 800px;
+        margin: 0 auto;
+      }
+      .faq-item {
+        background: linear-gradient(135deg, rgba(30, 41, 59, 0.7), rgba(15, 23, 42, 0.7));
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        border-radius: 16px;
+        padding: 24px;
+        backdrop-filter: blur(12px);
+      }
+      .faq-question {
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: #f1f5f9;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .faq-question i {
+        color: #a78bfa;
+      }
+      .faq-answer {
+        color: #64748b;
+        font-size: 0.9rem;
+        line-height: 1.7;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ── Navbar ── -->
+    <nav class="navbar" id="navbar">
+      <div class="logo">
+        <i class="fa-solid fa-briefcase"></i>
+        <span>InterviewTracker</span>
+      </div>
+
+      <button class="menu-btn" id="menuBtn" aria-label="Toggle navigation">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+
+      <ul class="nav-links" id="navLinks">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="../index.html#features">Features</a></li>
+        <li><a href="../index.html#about">About</a></li>
+        <li><a href="../index.html#contact">Contact</a></li>
+        <li><a href="login.html">Login</a></li>
+        <li><a href="register.html" class="register-btn">Register</a></li>
+      </ul>
+    </nav>
+
+    <!-- ── Main Section ── -->
+    <main class="container">
+      <section class="about-section">
+        
+        <!-- Header -->
+        <div class="about-header animate-in" style="--delay:0s">
+          <div class="section-badge">
+            <i class="fa-solid fa-circle-question"></i> Help Desk
+          </div>
+          <h1>Frequently Asked Questions</h1>
+          <p>
+            Got questions? We've got answers. Explore common queries regarding accounts, security, and visual metrics below.
+          </p>
+        </div>
+
+        <!-- FAQ Content -->
+        <div class="faq-list animate-in" style="--delay:0.1s">
+          <div class="faq-item">
+            <h3 class="faq-question"><i class="fa-solid fa-circle-info"></i> How does the interview tracker help my search?</h3>
+            <p class="faq-answer">
+              By consolidating all applications, timelines, notes, and metrics into a single screen, you prevent missing round deadlines, record DSA question logs, and analyze where your pipeline bottlenecks are.
+            </p>
+          </div>
+
+          <div class="faq-item">
+            <h3 class="faq-question"><i class="fa-solid fa-shield-halved"></i> Is my resume and data secure?</h3>
+            <p class="faq-answer">
+              Yes, all documents and records are securely stored with encryption profiles on our server databases. Your dashboard is private and only accessible with verified authorization tokens.
+            </p>
+          </div>
+
+          <div class="faq-item">
+            <h3 class="faq-question"><i class="fa-solid fa-chart-line"></i> How are placement statistics calculated?</h3>
+            <p class="faq-answer">
+              We compile your application logs (selections, rejections, pending offers) and run real-time aggregation queries to display visual clearance percentages and domain activity breakdowns on the analytics workspace.
+            </p>
+          </div>
+        </div>
+
+      </section>
+    </main>
+
+    <!-- ── Footer ── -->
+    <footer class="footer">
+      <div class="footer-content">
+        <div class="footer-brand">
+          <div class="footer-logo">
+            <i class="fa-solid fa-briefcase"></i>
+            <span>InterviewTracker</span>
+          </div>
+          <p>Smart Interview Tracker &amp; Analyzer for students and job seekers. Track every application, ace every interview.</p>
+          <div class="social-wrapper">
+            <span class="social-title">Follow Us</span>
+            <div class="social-icons">
+              <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+              <a href="#" aria-label="GitHub"><i class="fab fa-github"></i></a>
+              <a href="#" aria-label="Twitter"><i class="fab fa-x-twitter"></i></a>
+              <a href="mailto:jayantkumar2901@gmail.com" aria-label="Email"><i class="fa-solid fa-envelope"></i></a>
+            </div>
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <h4>Product</h4>
+          <a href="dashboard.html">Dashboard</a>
+          <a href="analytics.html">Analytics</a>
+          <a href="profile.html">Resume AI</a>
+          <a href="pricing.html">Pricing</a>
+        </div>
+
+        <div class="footer-col">
+          <h4>Resources</h4>
+          <a href="documentation.html">Documentation</a>
+          <a href="faq.html">FAQ</a>
+          <a href="blog.html">Blog</a>
+          <a href="../index.html#contact">Support</a>
+        </div>
+
+        <div class="footer-col">
+          <h4>Legal</h4>
+          <a href="privacy.html">Privacy Policy</a>
+          <a href="terms.html">Terms of Service</a>
+          <a href="cookies.html">Cookie Policy</a>
+          <a href="disclaimer.html">Disclaimer</a>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>© 2026 Smart Interview Tracker &amp; Analyzer. All Rights Reserved.</p>
+      </div>
+    </footer>
+
+    <script>
+      const menuBtn = document.getElementById("menuBtn");
+      const navLinks = document.getElementById("navLinks");
+      menuBtn?.addEventListener("click", () => {
+        navLinks?.classList.toggle("active");
+      });
+    </script>
+  </body>
+</html>

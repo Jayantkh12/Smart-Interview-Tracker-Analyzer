@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Applications | Smart Interview Tracker</title>
-
+    <meta name="description" content="Manage all your job applications — track status, filter by company, and log interview notes in one place." />
     <link rel="stylesheet" href="../css/applications.css" />
     <link
       rel="stylesheet"
@@ -13,6 +13,7 @@
   </head>
 
   <body>
+    <!-- ── Navbar ── -->
     <nav class="navbar">
       <div class="logo">
         <i class="fa-solid fa-briefcase"></i>
@@ -23,169 +24,245 @@
         <i class="fa-solid fa-bars"></i>
       </button>
 
-      <ul class="nav-links">
+      <ul class="nav-links" id="navLinks">
         <li><a href="dashboard.html">Dashboard</a></li>
         <li><a href="applications.html" class="active">Applications</a></li>
         <li><a href="analytics.html">Analytics</a></li>
         <li><a href="profile.html">Profile</a></li>
-        <li><a href="../index.html">Logout</a></li>
+        <li><a href="../index.html" id="logoutBtn">Logout</a></li>
       </ul>
     </nav>
 
     <main class="container">
-      <h1><i class="fa-solid fa-list-check"></i> Applications</h1>
 
-      <section class="stats" aria-label="Application statistics">
-        <div class="stat-card">
-          <h3>Total Apps</h3>
-          <p id="totalApps">0</p>
+      <!-- ── Page Header ── -->
+      <div class="page-header animate-in" style="--delay:0s">
+        <div>
+          <h1><i class="fa-solid fa-list-check"></i> Applications</h1>
+          <p class="page-sub">Track every application across your job search journey</p>
         </div>
-
-        <div class="stat-card">
-          <h3>Applied</h3>
-          <p id="appliedApps">0</p>
-        </div>
-
-        <div class="stat-card">
-          <h3>Interviews</h3>
-          <p id="interviewApps">0</p>
-        </div>
-
-        <div class="stat-card">
-          <h3>Offers</h3>
-          <p id="offerApps">0</p>
-        </div>
-
-        <div class="stat-card">
-          <h3>Rejected</h3>
-          <p id="rejectedApps">0</p>
-        </div>
-      </section>
-
-      <div class="search-box">
-        <input
-          id="searchInput"
-          type="text"
-          placeholder="Search Company / Role"
-        />
+        <button class="add-btn" id="scrollToFormBtn">
+          <i class="fa-solid fa-plus"></i> Add Application
+        </button>
       </div>
 
-      <section class="table-container">
-        <h2>Your Applications</h2>
+      <!-- ── Stat Cards ── -->
+      <section class="stats-grid" aria-label="Application statistics">
 
-        <table>
-          <thead>
-            <tr>
-              <th>Company</th>
+        <div class="stat-card animate-in" style="--delay:0.05s">
+          <div class="stat-icon-wrap icon-blue">
+            <i class="fa-solid fa-layer-group"></i>
+          </div>
+          <div class="stat-info">
+            <p class="stat-label">Total Apps</p>
+            <p class="stat-value" id="totalApps">—</p>
+          </div>
+        </div>
 
-              <th>Role</th>
+        <div class="stat-card animate-in" style="--delay:0.10s">
+          <div class="stat-icon-wrap icon-teal">
+            <i class="fa-solid fa-paper-plane"></i>
+          </div>
+          <div class="stat-info">
+            <p class="stat-label">Applied</p>
+            <p class="stat-value" id="appliedApps">—</p>
+          </div>
+        </div>
 
-              <th id="packageSortBtn" class="sort-btn">Expected Package ↕</th>
+        <div class="stat-card animate-in" style="--delay:0.15s">
+          <div class="stat-icon-wrap icon-purple">
+            <i class="fa-solid fa-calendar-check"></i>
+          </div>
+          <div class="stat-info">
+            <p class="stat-label">Interviews</p>
+            <p class="stat-value" id="interviewApps">—</p>
+          </div>
+        </div>
 
-              <th>
-                <select id="selectFilter">
-                  <option value="All">Status ▼</option>
-                  <option value="Applied">Applied</option>
-                  <option value="Interview">Interview</option>
-                  <option value="Offer">Offer</option>
-                  <option value="Rejected">Rejected</option>
-                </select>
-              </th>
+        <div class="stat-card animate-in" style="--delay:0.20s">
+          <div class="stat-icon-wrap icon-green">
+            <i class="fa-solid fa-trophy"></i>
+          </div>
+          <div class="stat-info">
+            <p class="stat-label">Offers</p>
+            <p class="stat-value" id="offerApps">—</p>
+          </div>
+        </div>
 
-              <th id="dateSortBtn" class="sort-btn">Applied Date ↕</th>
+        <div class="stat-card animate-in" style="--delay:0.25s">
+          <div class="stat-icon-wrap icon-red">
+            <i class="fa-solid fa-circle-xmark"></i>
+          </div>
+          <div class="stat-info">
+            <p class="stat-label">Rejected</p>
+            <p class="stat-value" id="rejectedApps">—</p>
+          </div>
+        </div>
 
-              <th>Actions</th>
-            </tr>
-          </thead>
-
-          <tbody id="applicationsBody">
-            <tr>
-              <td colspan="6" class="empty-row">Loading applications...</td>
-            </tr>
-          </tbody>
-        </table>
       </section>
 
-      <section class="form-box">
-        <h2>Add New Application</h2>
+      <!-- ── Table Card ── -->
+      <section class="card table-card animate-in" style="--delay:0.3s">
 
-        <form id="applicationForm">
-          <div class="input-group">
-            <label for="companyname">Company Name</label>
-            <input
-              id="companyname"
-              type="text"
-              placeholder="Enter company name"
-              required
-            />
-          </div>
-
-          <div class="input-group">
-            <label for="jobrole">Job Role</label>
-            <input id="jobrole" type="text" placeholder="Enter role" required />
-          </div>
-
-          <div class="input-group">
-            <label for="package">Package (LPA)</label>
-            <input
-              id="package"
-              type="number"
-              min="0"
-              step="0.1"
-              placeholder="Expected package"
-              required
-            />
-          </div>
-
-          <div class="input-group">
-            <label for="applicationlink">Application Link</label>
-            <input
-              id="applicationlink"
-              type="url"
-              placeholder="Paste application link"
-              required
-            />
-          </div>
-
-          <div class="input-group full-width resume-upload">
-            <label for="resume">Resume</label>
-
-            <div class="resume-box">
-              <input type="file" id="resume" accept=".pdf,.doc,.docx" hidden />
-
-              <button type="button" id="uploadBtn">
-                <i class="fa-solid fa-upload"></i>
-                Choose File
-              </button>
-
-              <span id="fileName">No file selected</span>
-
-              <button
-                type="button"
-                id="previewBtn"
-                aria-label="Preview resume"
-                disabled
-              >
-                <i class="fa-solid fa-eye"></i>
-              </button>
+        <div class="card-header">
+          <h2><i class="fa-solid fa-table-list"></i> Your Applications</h2>
+          <div class="table-controls">
+            <div class="search-wrap">
+              <i class="fa-solid fa-magnifying-glass search-icon"></i>
+              <input
+                id="searchInput"
+                type="text"
+                placeholder="Search company or role…"
+                class="search-input"
+              />
+            </div>
+            <div class="select-wrap">
+              <select id="selectFilter" class="filter-select">
+                <option value="All">All Status</option>
+                <option value="Applied">Applied</option>
+                <option value="OA Cleared">OA Cleared</option>
+                <option value="Interview Scheduled">Interview Scheduled</option>
+                <option value="Selected">Selected</option>
+                <option value="Rejected">Rejected</option>
+              </select>
+              <i class="fa-solid fa-chevron-down select-chevron"></i>
             </div>
           </div>
+        </div>
 
-          <div class="input-group full-width">
-            <label for="notes">Notes</label>
-            <textarea
-              id="notes"
-              rows="5"
-              placeholder="Write notes here..."
-            ></textarea>
+        <!-- Sort bar -->
+        <div class="sort-bar">
+          <button class="sort-btn" id="packageSortBtn">
+            <i class="fa-solid fa-arrow-up-wide-short"></i>
+            Package
+          </button>
+          <button class="sort-btn" id="dateSortBtn">
+            <i class="fa-solid fa-calendar-days"></i>
+            Date
+          </button>
+        </div>
+
+        <div class="table-wrap">
+          <table class="applications-table" aria-label="Job applications">
+            <thead>
+              <tr>
+                <th>Company</th>
+                <th>Role</th>
+                <th>Package</th>
+                <th>Status</th>
+                <th>Applied Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="applicationsBody">
+              <tr>
+                <td colspan="6" class="table-loading">
+                  <i class="fa-solid fa-circle-notch fa-spin"></i> Loading applications…
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ── Add / Edit Form Card ── -->
+      <section class="card form-card animate-in" style="--delay:0.36s" id="formCard">
+
+        <div class="card-header">
+          <h2 id="formTitle"><i class="fa-solid fa-plus-circle"></i> Add New Application</h2>
+          <button class="cancel-edit-btn" id="cancelEditBtn" style="display:none">
+            <i class="fa-solid fa-xmark"></i> Cancel Edit
+          </button>
+        </div>
+
+        <form id="applicationForm" novalidate>
+          <div class="form-grid">
+
+            <div class="form-group">
+              <label for="companyname">Company Name <span class="req">*</span></label>
+              <div class="input-icon-wrap">
+                <i class="fa-solid fa-building input-icon"></i>
+                <input
+                  id="companyname"
+                  type="text"
+                  placeholder="e.g. Google, Microsoft"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="jobrole">Job Role <span class="req">*</span></label>
+              <div class="input-icon-wrap">
+                <i class="fa-solid fa-briefcase input-icon"></i>
+                <input id="jobrole" type="text" placeholder="e.g. Software Engineer" required />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="package">Package (LPA)</label>
+              <div class="input-icon-wrap">
+                <i class="fa-solid fa-indian-rupee-sign input-icon"></i>
+                <input
+                  id="package"
+                  type="number"
+                  min="0"
+                  step="0.1"
+                  placeholder="e.g. 12"
+                />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="applicationlink">Application Link <span class="optional">(optional)</span></label>
+              <div class="input-icon-wrap">
+                <i class="fa-solid fa-link input-icon"></i>
+                <input
+                  id="applicationlink"
+                  type="url"
+                  placeholder="Paste job posting URL"
+                />
+              </div>
+            </div>
+
+            <!-- Resume upload -->
+            <div class="form-group resume-group">
+              <label>Resume <span class="optional">(optional)</span></label>
+              <div class="resume-upload-box">
+                <input type="file" id="resume" accept=".pdf,.doc,.docx" hidden />
+                <button type="button" id="uploadBtn" class="resume-pick-btn">
+                  <i class="fa-solid fa-upload"></i> Choose File
+                </button>
+                <span id="fileName" class="file-name-label">No file selected</span>
+                <button type="button" id="previewBtn" class="resume-preview-btn" disabled aria-label="Preview resume">
+                  <i class="fa-solid fa-eye"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Notes -->
+            <div class="form-group notes-group">
+              <label for="notes">Notes <span class="optional">(optional)</span></label>
+              <textarea
+                id="notes"
+                rows="4"
+                placeholder="Add interview notes, questions asked, prep points…"
+              ></textarea>
+            </div>
+
           </div>
 
-          <button type="submit">Save Application</button>
+          <div class="form-actions">
+            <button type="submit" id="submitBtn" class="submit-btn">
+              <i class="fa-solid fa-floppy-disk"></i> Save Application
+            </button>
+          </div>
         </form>
       </section>
+
     </main>
 
-    <!-- Application Detail Modal -->
+    <!-- ── Application Detail Modal ── -->
     <div
       id="appDetailModal"
       class="modal-overlay"
@@ -198,73 +275,60 @@
           <h2 id="modalTitle">
             <i class="fa-solid fa-file-lines"></i> Application Details
           </h2>
-          <button
-            id="modalCloseBtn"
-            class="modal-close-btn"
-            aria-label="Close modal"
-          >
+          <button id="modalCloseBtn" class="modal-close-btn" aria-label="Close modal">
             <i class="fa-solid fa-xmark"></i>
           </button>
         </div>
 
         <div class="modal-body">
           <div class="modal-row">
-            <span class="modal-label"
-              ><i class="fa-solid fa-building"></i> Company</span
-            >
+            <span class="modal-label"><i class="fa-solid fa-building"></i> Company</span>
             <span class="modal-value" id="modalCompany">--</span>
           </div>
           <div class="modal-row">
-            <span class="modal-label"
-              ><i class="fa-solid fa-briefcase"></i> Role</span
-            >
+            <span class="modal-label"><i class="fa-solid fa-briefcase"></i> Role</span>
             <span class="modal-value" id="modalRole">--</span>
           </div>
           <div class="modal-row">
-            <span class="modal-label"
-              ><i class="fa-solid fa-indian-rupee-sign"></i> Package</span
-            >
+            <span class="modal-label"><i class="fa-solid fa-indian-rupee-sign"></i> Package</span>
             <span class="modal-value" id="modalPackage">--</span>
           </div>
           <div class="modal-row">
-            <span class="modal-label"
-              ><i class="fa-solid fa-circle-dot"></i> Status</span
-            >
-            <span class="modal-value"
-              ><span id="modalStatus" class="modal-status">--</span></span
-            >
+            <span class="modal-label"><i class="fa-solid fa-circle-dot"></i> Status</span>
+            <span class="modal-value"><span id="modalStatus" class="modal-status">--</span></span>
           </div>
           <div class="modal-row">
-            <span class="modal-label"
-              ><i class="fa-solid fa-calendar"></i> Applied Date</span
-            >
+            <span class="modal-label"><i class="fa-solid fa-calendar"></i> Applied</span>
             <span class="modal-value" id="modalDate">--</span>
           </div>
           <div class="modal-row">
-            <span class="modal-label"
-              ><i class="fa-solid fa-link"></i> Link</span
-            >
-            <span class="modal-value"
-              ><a id="modalLink" class="modal-link">--</a></span
-            >
+            <span class="modal-label"><i class="fa-solid fa-link"></i> Link</span>
+            <span class="modal-value"><a id="modalLink" class="modal-link" target="_blank" rel="noopener noreferrer">--</a></span>
           </div>
           <div class="modal-row">
-            <span class="modal-label"
-              ><i class="fa-solid fa-file"></i> Resume</span
-            >
+            <span class="modal-label"><i class="fa-solid fa-file"></i> Resume</span>
             <span class="modal-value" id="modalResume">--</span>
           </div>
           <div class="modal-row modal-notes-row">
-            <span class="modal-label"
-              ><i class="fa-solid fa-note-sticky"></i> Notes</span
-            >
+            <span class="modal-label"><i class="fa-solid fa-note-sticky"></i> Notes</span>
             <span class="modal-value" id="modalNotes">--</span>
           </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="modal-action-btn btn-edit-modal" id="modalEditBtn">
+            <i class="fa-solid fa-pen"></i> Edit
+          </button>
+          <button class="modal-action-btn btn-close-modal" id="modalCloseFooter">
+            Close
+          </button>
         </div>
       </div>
     </div>
 
-    <script src="../js/dataService.js"></script>
+    <!-- ── Toast ── -->
+    <div class="toast" id="globalToast"></div>
+
     <script src="../js/applications.js"></script>
   </body>
 </html>

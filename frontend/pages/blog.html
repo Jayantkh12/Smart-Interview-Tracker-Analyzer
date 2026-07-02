@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Blog | Smart Interview Tracker</title>
+    <meta name="description" content="Read recruitment tips, placement guides, and resume optimization blogs to level up your hiring search." />
+    <link rel="stylesheet" href="../css/pages.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    />
+    <style>
+      .blog-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 30px;
+        max-width: 900px;
+        margin: 0 auto;
+      }
+      .blog-card {
+        background: linear-gradient(135deg, rgba(30, 41, 59, 0.75), rgba(15, 23, 42, 0.75));
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        border-radius: 20px;
+        padding: 30px;
+        backdrop-filter: blur(12px);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        transition: transform 0.3s, border-color 0.3s;
+      }
+      .blog-card:hover {
+        transform: translateY(-5px);
+        border-color: rgba(108, 99, 255, 0.3);
+      }
+      .blog-meta {
+        font-size: 0.75rem;
+        color: #a78bfa;
+        font-weight: 600;
+        margin-bottom: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+      .blog-title {
+        font-size: 1.15rem;
+        font-weight: 800;
+        color: #f1f5f9;
+        margin-bottom: 12px;
+        line-height: 1.4;
+      }
+      .blog-summary {
+        color: #64748b;
+        font-size: 0.88rem;
+        line-height: 1.65;
+        margin-bottom: 20px;
+      }
+      .blog-link {
+        font-size: 0.88rem;
+        font-weight: 700;
+        color: #38bdf8;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: gap 0.2s;
+      }
+      .blog-link:hover {
+        gap: 10px;
+        color: #7dd3fc;
+      }
+      @media (max-width: 768px) {
+        .blog-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ── Navbar ── -->
+    <nav class="navbar" id="navbar">
+      <div class="logo">
+        <i class="fa-solid fa-briefcase"></i>
+        <span>InterviewTracker</span>
+      </div>
+
+      <button class="menu-btn" id="menuBtn" aria-label="Toggle navigation">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+
+      <ul class="nav-links" id="navLinks">
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="../index.html#features">Features</a></li>
+        <li><a href="../index.html#about">About</a></li>
+        <li><a href="../index.html#contact">Contact</a></li>
+        <li><a href="login.html">Login</a></li>
+        <li><a href="register.html" class="register-btn">Register</a></li>
+      </ul>
+    </nav>
+
+    <!-- ── Main Section ── -->
+    <main class="container">
+      <section class="about-section">
+        
+        <!-- Header -->
+        <div class="about-header animate-in" style="--delay:0s">
+          <div class="section-badge">
+            <i class="fa-solid fa-newspaper"></i> Latest Articles
+          </div>
+          <h1>Placement Blog</h1>
+          <p>
+            Insights, guides, and suggestions compiled by SWE mentors to help you optimize application search outcomes.
+          </p>
+        </div>
+
+        <!-- Grid -->
+        <div class="blog-grid animate-in" style="--delay:0.1s">
+          
+          <div class="blog-card">
+            <div>
+              <div class="blog-meta">Career Advice &bull; July 2026</div>
+              <h2 class="blog-title">How to Organize 50+ Job Applications Without Burnout</h2>
+              <p class="blog-summary">
+                Tracking multiple hiring timelines across distinct email accounts can get exhausting. Discover how a centralized dashboard saves prep time.
+              </p>
+            </div>
+            <a href="#" class="blog-link">Read Article <i class="fa-solid fa-arrow-right"></i></a>
+          </div>
+
+          <div class="blog-card">
+            <div>
+              <div class="blog-meta">Resume prep &bull; June 2026</div>
+              <h2 class="blog-title">Tailoring Resumes for Automated ATS Systems</h2>
+              <p class="blog-summary">
+                Discover the exact keyword optimization structures required to clear initial system filters and verify your resumes match target keywords.
+              </p>
+            </div>
+            <a href="#" class="blog-link">Read Article <i class="fa-solid fa-arrow-right"></i></a>
+          </div>
+
+        </div>
+
+      </section>
+    </main>
+
+    <!-- ── Footer ── -->
+    <footer class="footer">
+      <div class="footer-content">
+        <div class="footer-brand">
+          <div class="footer-logo">
+            <i class="fa-solid fa-briefcase"></i>
+            <span>InterviewTracker</span>
+          </div>
+          <p>Smart Interview Tracker &amp; Analyzer for students and job seekers. Track every application, ace every interview.</p>
+          <div class="social-wrapper">
+            <span class="social-title">Follow Us</span>
+            <div class="social-icons">
+              <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+              <a href="#" aria-label="GitHub"><i class="fab fa-github"></i></a>
+              <a href="#" aria-label="Twitter"><i class="fab fa-x-twitter"></i></a>
+              <a href="mailto:jayantkumar2901@gmail.com" aria-label="Email"><i class="fa-solid fa-envelope"></i></a>
+            </div>
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <h4>Product</h4>
+          <a href="dashboard.html">Dashboard</a>
+          <a href="analytics.html">Analytics</a>
+          <a href="profile.html">Resume AI</a>
+          <a href="pricing.html">Pricing</a>
+        </div>
+
+        <div class="footer-col">
+          <h4>Resources</h4>
+          <a href="documentation.html">Documentation</a>
+          <a href="faq.html">FAQ</a>
+          <a href="blog.html">Blog</a>
+          <a href="../index.html#contact">Support</a>
+        </div>
+
+        <div class="footer-col">
+          <h4>Legal</h4>
+          <a href="privacy.html">Privacy Policy</a>
+          <a href="terms.html">Terms of Service</a>
+          <a href="cookies.html">Cookie Policy</a>
+          <a href="disclaimer.html">Disclaimer</a>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>© 2026 Smart Interview Tracker &amp; Analyzer. All Rights Reserved.</p>
+      </div>
+    </footer>
+
+    <script>
+      const menuBtn = document.getElementById("menuBtn");
+      const navLinks = document.getElementById("navLinks");
+      menuBtn?.addEventListener("click", () => {
+        navLinks?.classList.toggle("active");
+      });
+    </script>
+  </body>
+</html>

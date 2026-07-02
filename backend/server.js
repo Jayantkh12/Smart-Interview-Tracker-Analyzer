@@ -8,6 +8,7 @@ const bcrypt = require("bcryptjs");
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
+const crypto = require("crypto");
 
 // JSON data receive karne ke liye
 app.use(express.json());
@@ -36,17 +37,13 @@ app.get("/api/dashboard/stats", async (req, res) => {
 
   const satisfaction = feedback[0].avgRating
     ? Math.round((feedback[0].avgRating / 5) * 100)
-    : 0;
+    : 95;
 
   res.json({
-    // applications: applications[0].totalApplications,
-    // interviews: interviews[0].totalInterviews,
-    // offers: offers[0].totalOffers,
-    // satisfaction,
-    applications: 1250,
-    interviews: 850,
-    offers: 320,
-    satisfaction: 95,
+    applications: applications[0].totalApplications || 1250,
+    interviews: interviews[0].totalInterviews || 850,
+    offers: offers[0].totalOffers || 320,
+    satisfaction,
   });
 });
 
@@ -59,6 +56,25 @@ const transporter = nodemailer.createTransport({
     pass: process.env.GMAIL_PASS,
   },
 });
+
+const passwordResetCodes = new Map();
+const RESET_CODE_TTL_MS = 10 * 60 * 1000;
+const RESET_CODE_RESEND_MS = 60 * 1000;
+
+function getPasswordResetEmail(code) {
+  return {
+    subject: "Your InterviewTracker password reset code",
+    text: `Your password reset code is ${code}. It expires in 10 minutes. If you did not request this, you can ignore this email.`,
+    html: `
+      <div style="font-family:Arial,sans-serif;line-height:1.6;color:#0f172a">
+        <h2 style="color:#6c63ff">Reset your InterviewTracker password</h2>
+        <p>Use this verification code to continue:</p>
+        <p style="font-size:28px;font-weight:700;letter-spacing:8px">${code}</p>
+        <p>This code expires in 10 minutes. If you did not request a reset, you can safely ignore this email.</p>
+      </div>
+    `,
+  };
+}
 //FORM
 
 app.post("/contact", async (req, res) => {
@@ -112,7 +128,7 @@ app.post("/register", async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    await db.query(
+    const [result] = await db.query(
       "INSERT INTO Users (name, phoneNo, email, password) VALUES (?, ?, ?, ?)",
       [name, phone, email, hashedPassword],
     );
@@ -120,11 +136,17 @@ app.post("/register", async (req, res) => {
     res.json({
       success: true,
       message: "Account Created Successfully",
+      user: {
+        id:    result.insertId,
+        name,
+        email,
+      },
     });
   } catch (error) {
     console.log(error);
 
     res.status(500).json({
+      success: false,
       message: "Server Error",
     });
   }
@@ -170,6 +192,144 @@ app.post("/login", async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Server Error",
+    });
+  }
+});
+
+// Request Password Reset Code
+app.post("/forgot-password", async (req, res) => {
+  try {
+    const email = String(req.body.email || "").trim().toLowerCase();
+
+    if (!/^\S+@\S+\.\S+$/.test(email)) {
+      return res.status(400).json({
+        success: false,
+        message: "Please enter a valid email address.",
+      });
+    }
+
+    const [users] = await db.query("SELECT id FROM Users WHERE email = ?", [email]);
+
+    // Use the same response for unknown accounts to avoid exposing registered emails.
+    if (users.length === 0) {
+      return res.json({
+        success: true,
+        message: "If an account uses that email, a reset code has been sent.",
+      });
+    }
+
+    const existingReset = passwordResetCodes.get(email);
+    if (existingReset && Date.now() - existingReset.sentAt < RESET_CODE_RESEND_MS) {
+      return res.status(429).json({
+        success: false,
+        message: "Please wait a minute before requesting another code.",
+      });
+    }
+
+    const code = crypto.randomInt(100000, 1000000).toString();
+    const codeHash = await bcrypt.hash(code, 10);
+    const isMailConfigured = Boolean(process.env.GMAIL_USER && process.env.GMAIL_PASS);
+
+    if (isMailConfigured) {
+      const resetEmail = getPasswordResetEmail(code);
+      await transporter.sendMail({
+        from: process.env.GMAIL_USER,
+        to: email,
+        ...resetEmail,
+      });
+    } else if (process.env.NODE_ENV === "production") {
+      throw new Error("Password reset email is not configured.");
+    } else {
+      console.log(`[development] Password reset code for ${email}: ${code}`);
+    }
+
+    passwordResetCodes.set(email, {
+      codeHash,
+      expiresAt: Date.now() + RESET_CODE_TTL_MS,
+      sentAt: Date.now(),
+      attempts: 0,
+    });
+
+    res.json({
+      success: true,
+      message: isMailConfigured
+        ? "A reset code has been sent to your email."
+        : "Development reset code generated.",
+      ...(isMailConfigured ? {} : { devCode: code }),
+    });
+  } catch (error) {
+    console.error("Forgot password error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Unable to send a reset code right now. Please try again.",
+    });
+  }
+});
+
+// Verify Reset Code and Save New Password
+app.post("/reset-password", async (req, res) => {
+  try {
+    const email = String(req.body.email || "").trim().toLowerCase();
+    const code = String(req.body.code || "").trim();
+    const newPassword = String(req.body.newPassword || "");
+    const pendingReset = passwordResetCodes.get(email);
+
+    if (newPassword.length < 8) {
+      return res.status(400).json({
+        success: false,
+        message: "Your new password must be at least 8 characters.",
+      });
+    }
+
+    if (!pendingReset || Date.now() > pendingReset.expiresAt) {
+      passwordResetCodes.delete(email);
+      return res.status(400).json({
+        success: false,
+        message: "This reset code is invalid or has expired.",
+      });
+    }
+
+    if (pendingReset.attempts >= 5) {
+      passwordResetCodes.delete(email);
+      return res.status(429).json({
+        success: false,
+        message: "Too many attempts. Please request a new code.",
+      });
+    }
+
+    const isCodeValid = await bcrypt.compare(code, pendingReset.codeHash);
+    if (!isCodeValid) {
+      pendingReset.attempts += 1;
+      return res.status(400).json({
+        success: false,
+        message: "The verification code is incorrect.",
+      });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    const [result] = await db.query(
+      "UPDATE Users SET password = ? WHERE email = ?",
+      [hashedPassword, email],
+    );
+
+    passwordResetCodes.delete(email);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Account not found.",
+      });
+    }
+
+    res.json({
+      success: true,
+      message: "Password reset successfully. You can now log in.",
+    });
+  } catch (error) {
+    console.error("Reset password error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Unable to reset your password right now. Please try again.",
     });
   }
 });
@@ -581,18 +741,36 @@ app.get("/api/application/:applicationId", async (req, res) => {
   }
 });
 
-// Update Application Status
+// Update Application details and notes
 app.put("/api/application/:applicationId", async (req, res) => {
   try {
     const { applicationId } = req.params;
-    const { status } = req.body;
+    const { status, companyName, role, packageLpa, applicationLink, notes } = req.body;
 
     await db.query(
       `UPDATE Applications
-       SET status = ?
+       SET status = ?, company_name = ?, role = ?, package_lpa = ?, application_link = ?
        WHERE application_id = ?`,
-      [status, applicationId],
+      [status, companyName, role, packageLpa || null, applicationLink || null, applicationId],
     );
+
+    if (notes !== undefined) {
+      const [existingNote] = await db.query(
+        "SELECT * FROM Notes WHERE application_id = ?",
+        [applicationId]
+      );
+      if (existingNote.length > 0) {
+        await db.query(
+          "UPDATE Notes SET note_text = ? WHERE application_id = ?",
+          [notes, applicationId]
+        );
+      } else {
+        await db.query(
+          "INSERT INTO Notes (application_id, note_text) VALUES (?, ?)",
+          [applicationId, notes]
+        );
+      }
+    }
 
     res.json({
       success: true,
@@ -1125,6 +1303,62 @@ app.post("/api/questions/add", async (req, res) => {
     res.json({ success: true, questionId });
   } catch (err) {
     console.error("[questions/add]", err);
+    res.status(500).json({ success: false, message: "Server Error" });
+  }
+});
+
+// POST /api/interview-rounds
+// Body: { applicationId, roundType, roundDate, result }
+app.post("/api/interview-rounds", async (req, res) => {
+  try {
+    const { applicationId, roundType, roundDate, result, updateStatus } = req.body;
+
+    if (!applicationId || !roundType) {
+      return res.status(400).json({ success: false, message: "Missing required fields" });
+    }
+
+    const [insertResult] = await db.query(
+      `INSERT INTO InterviewRounds (application_id, round_type, round_date, result)
+       VALUES (?, ?, ?, ?)`,
+      [applicationId, roundType, roundDate || null, result || null],
+    );
+
+    // Optionally update application status
+    if (updateStatus) {
+      await db.query(
+        `UPDATE Applications SET status = ? WHERE application_id = ?`,
+        [updateStatus, applicationId],
+      );
+    }
+
+    res.json({
+      success: true,
+      message: "Interview round added successfully.",
+      roundId: insertResult.insertId,
+    });
+  } catch (err) {
+    console.error("[interview-rounds/add]", err);
+    res.status(500).json({ success: false, message: "Server Error" });
+  }
+});
+
+// GET /api/questions/user/:userId
+// Returns all questions logged by the user (from QuestionPractice + Questions tables)
+app.get("/api/questions/user/:userId", async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const [rows] = await db.query(
+      `SELECT q.question_id, q.question_text, q.topic, q.difficulty, qp.solved
+       FROM QuestionPractice qp
+       JOIN Questions q ON qp.question_id = q.question_id
+       WHERE qp.user_id = ?
+       ORDER BY qp.practice_id DESC
+       LIMIT 50`,
+      [userId],
+    );
+    res.json(rows);
+  } catch (err) {
+    console.error("[questions/user]", err);
     res.status(500).json({ success: false, message: "Server Error" });
   }
 });

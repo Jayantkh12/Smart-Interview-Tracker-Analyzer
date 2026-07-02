@@ -4,9 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Profile | Smart Interview Tracker</title>
-
+    <meta name="description" content="Manage your profile, upload resume, add skills and update career preferences on Smart Interview Tracker." />
     <link rel="stylesheet" href="../css/profile.css" />
-
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
@@ -14,6 +13,7 @@
   </head>
 
   <body>
+    <!-- ── Navbar ── -->
     <nav class="navbar">
       <div class="logo">
         <i class="fa-solid fa-briefcase"></i>
@@ -24,273 +24,312 @@
         <i class="fa-solid fa-bars"></i>
       </button>
 
-      <ul class="nav-links">
+      <ul class="nav-links" id="navLinks">
         <li><a href="dashboard.html">Dashboard</a></li>
         <li><a href="applications.html">Applications</a></li>
         <li><a href="analytics.html">Analytics</a></li>
-        <li><a href="profile.html">Profile</a></li>
-        <li><a href="../index.html">Logout</a></li>
+        <li><a href="profile.html" class="active">Profile</a></li>
+        <li><a href="../index.html" id="logoutBtn">Logout</a></li>
       </ul>
     </nav>
 
-    <div class="profile-container">
-      <h1><i class="fa-solid fa-user-plus"></i> Complete Your Profile</h1>
+    <main class="container">
 
-      <p class="profile-subtitle" id="newUserMessage">
-        You are a new user. Please complete your profile first.
-      </p>
-
-      <div class="profile-card">
-        <div class="profile-image">
-          <img
-            src="https://cdn-icons-png.flaticon.com/512/847/847969.png"
-            alt="Profile Picture"
-            id="photoPreview"
-          />
-
-          <label for="photoInput" class="upload-btn">
-            <i class="fa-solid fa-camera"></i>
-            Upload Photo
-          </label>
-
-          <input
-            type="file"
-            id="photoInput"
-            accept="image/png,image/jpeg,image/jpg"
-            hidden
-          />
+      <!-- ── Page Header ── -->
+      <div class="page-header animate-in" style="--delay:0s">
+        <div>
+          <h1><i class="fa-solid fa-user-circle"></i> My Profile</h1>
+          <p class="page-sub" id="newUserMessage">Complete your profile to get personalized insights</p>
         </div>
-
-        <form class="profile-info" id="profileForm">
-          <div class="input-group">
-            <label>
-              <i class="fa-solid fa-user"></i>
-              Full Name
-            </label>
-            <input
-              type="text"
-              id="fullName"
-              placeholder="Enter your full name"
-              required
-            />
-          </div>
-
-          <div class="input-group">
-            <label>
-              <i class="fa-solid fa-envelope"></i>
-              Email Address
-            </label>
-            <input
-              type="email"
-              id="email"
-              placeholder="Enter your email address"
-              required
-            />
-          </div>
-
-          <div class="input-group">
-            <label>
-              <i class="fa-solid fa-phone"></i>
-              Phone Number
-            </label>
-            <input
-              type="tel"
-              id="phone"
-              placeholder="Enter your phone number"
-            />
-          </div>
-
-          <div class="input-group">
-            <label>
-              <i class="fa-solid fa-building-columns"></i>
-              College / University
-            </label>
-            <input
-              type="text"
-              id="college"
-              placeholder="Enter your college name"
-            />
-          </div>
-
-          <div class="input-group">
-            <label>
-              <i class="fa-solid fa-code"></i>
-              Branch / Department
-            </label>
-            <input type="text" id="branch" placeholder="e.g. CSE, IT, ECE" />
-          </div>
-
-          <div class="input-group">
-            <label>
-              <i class="fa-solid fa-graduation-cap"></i>
-              Graduation Year
-            </label>
-            <select id="graduationYear">
-              <option value="" selected disabled>Select Year</option>
-              <option>2026</option>
-              <option>2027</option>
-              <option>2028</option>
-              <option>2029</option>
-              <option>2030</option>
-            </select>
-          </div>
-        </form>
+        <button class="save-btn" id="saveProfileBtn" type="button">
+          <i class="fa-solid fa-floppy-disk"></i> Save Profile
+        </button>
       </div>
 
-      <div class="stats-container">
+      <!-- ── Stats Row ── -->
+      <section class="stats-grid animate-in" style="--delay:0.05s" aria-label="Profile statistics">
+
         <div class="stat-card">
-          <h2 id="profileTotalApps">0</h2>
-          <p>Applications</p>
+          <div class="stat-icon-wrap icon-blue">
+            <i class="fa-solid fa-layer-group"></i>
+          </div>
+          <div class="stat-info">
+            <p class="stat-label">Applications</p>
+            <p class="stat-value" id="profileTotalApps">—</p>
+          </div>
         </div>
 
         <div class="stat-card">
-          <h2 id="profileInterviews">0</h2>
-          <p>Interviews</p>
+          <div class="stat-icon-wrap icon-purple">
+            <i class="fa-solid fa-calendar-check"></i>
+          </div>
+          <div class="stat-info">
+            <p class="stat-label">Interviews</p>
+            <p class="stat-value" id="profileInterviews">—</p>
+          </div>
         </div>
 
         <div class="stat-card">
-          <h2 id="profileOffers">0</h2>
-          <p>Offers</p>
+          <div class="stat-icon-wrap icon-green">
+            <i class="fa-solid fa-trophy"></i>
+          </div>
+          <div class="stat-info">
+            <p class="stat-label">Offers</p>
+            <p class="stat-value" id="profileOffers">—</p>
+          </div>
         </div>
 
         <div class="stat-card">
-          <h2 id="profileRejected">0</h2>
-          <p>Rejected</p>
+          <div class="stat-icon-wrap icon-red">
+            <i class="fa-solid fa-circle-xmark"></i>
+          </div>
+          <div class="stat-info">
+            <p class="stat-label">Rejected</p>
+            <p class="stat-value" id="profileRejected">—</p>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ── Main Grid ── -->
+      <div class="profile-grid">
+
+        <!-- LEFT: Photo + Basic Info -->
+        <div class="profile-left">
+
+          <!-- Photo Card -->
+          <div class="card photo-card animate-in" style="--delay:0.10s">
+            <div class="photo-wrap">
+              <img
+                src="https://cdn-icons-png.flaticon.com/512/847/847969.png"
+                alt="Profile Picture"
+                id="photoPreview"
+                class="profile-photo"
+              />
+              <div class="photo-overlay">
+                <label for="photoInput" class="photo-edit-btn" aria-label="Upload photo">
+                  <i class="fa-solid fa-camera"></i>
+                </label>
+              </div>
+            </div>
+
+            <input type="file" id="photoInput" accept="image/png,image/jpeg,image/jpg" hidden />
+
+            <div class="photo-info">
+              <p class="photo-name" id="photoName">Your Name</p>
+              <p class="photo-email" id="photoEmail">your@email.com</p>
+            </div>
+
+            <label for="photoInput" class="upload-photo-btn">
+              <i class="fa-solid fa-camera"></i> Change Photo
+            </label>
+          </div>
+
+          <!-- Resume Card -->
+          <div class="card resume-card animate-in" style="--delay:0.15s">
+            <h2><i class="fa-solid fa-file-lines"></i> Resume</h2>
+
+            <div class="resume-display">
+              <div class="resume-icon-wrap">
+                <i class="fa-solid fa-file-pdf"></i>
+              </div>
+              <div class="resume-text">
+                <span id="resumeFileName">
+                  <i class="fa-solid fa-circle-info"></i> No resume uploaded yet
+                </span>
+              </div>
+            </div>
+
+            <div class="resume-actions">
+              <button class="btn-action btn-view-resume" id="viewResumeBtn" type="button" disabled>
+                <i class="fa-solid fa-eye"></i> View
+              </button>
+              <label for="resumeInput" class="btn-action btn-upload-resume">
+                <i class="fa-solid fa-upload"></i> Upload Resume
+              </label>
+              <input type="file" id="resumeInput" accept=".pdf,.doc,.docx" hidden />
+            </div>
+          </div>
+
+        </div>
+
+        <!-- RIGHT: Forms + Skills + Settings -->
+        <div class="profile-right">
+
+          <!-- Basic Info -->
+          <div class="card animate-in" style="--delay:0.12s">
+            <h2><i class="fa-solid fa-user"></i> Basic Information</h2>
+
+            <form class="info-grid" id="profileForm">
+
+              <div class="form-group">
+                <label for="fullName">Full Name <span class="req">*</span></label>
+                <div class="input-icon-wrap">
+                  <i class="fa-solid fa-user input-icon"></i>
+                  <input type="text" id="fullName" placeholder="Enter your full name" required />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="email">Email Address</label>
+                <div class="input-icon-wrap">
+                  <i class="fa-solid fa-envelope input-icon"></i>
+                  <input type="email" id="email" placeholder="Enter your email" readonly />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <div class="input-icon-wrap">
+                  <i class="fa-solid fa-phone input-icon"></i>
+                  <input type="tel" id="phone" placeholder="Enter your phone number" />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="college">College / University</label>
+                <div class="input-icon-wrap">
+                  <i class="fa-solid fa-building-columns input-icon"></i>
+                  <input type="text" id="college" placeholder="Enter your college name" />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="branch">Branch / Department</label>
+                <div class="input-icon-wrap">
+                  <i class="fa-solid fa-code input-icon"></i>
+                  <input type="text" id="branch" placeholder="e.g. CSE, IT, ECE" />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="graduationYear">Graduation Year</label>
+                <div class="input-icon-wrap select-icon-wrap">
+                  <i class="fa-solid fa-graduation-cap input-icon"></i>
+                  <select id="graduationYear">
+                    <option value="" selected disabled>Select Year</option>
+                    <option>2024</option>
+                    <option>2025</option>
+                    <option>2026</option>
+                    <option>2027</option>
+                    <option>2028</option>
+                    <option>2029</option>
+                    <option>2030</option>
+                  </select>
+                  <i class="fa-solid fa-chevron-down select-chevron"></i>
+                </div>
+              </div>
+
+            </form>
+          </div>
+
+          <!-- Career Preferences -->
+          <div class="card animate-in" style="--delay:0.17s">
+            <h2><i class="fa-solid fa-bullseye"></i> Career Preferences</h2>
+
+            <div class="info-grid">
+
+              <div class="form-group">
+                <label for="preferredRole">Preferred Role</label>
+                <div class="input-icon-wrap">
+                  <i class="fa-solid fa-laptop-code input-icon"></i>
+                  <input type="text" id="preferredRole" placeholder="e.g. Software Engineer, Data Analyst" />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="expectedPackage">Expected Package</label>
+                <div class="input-icon-wrap">
+                  <i class="fa-solid fa-indian-rupee-sign input-icon"></i>
+                  <input type="text" id="expectedPackage" placeholder="e.g. 10 LPA, 15 LPA" />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="preferredLocation">Preferred Location</label>
+                <div class="input-icon-wrap">
+                  <i class="fa-solid fa-location-dot input-icon"></i>
+                  <input type="text" id="preferredLocation" placeholder="e.g. Bangalore, Remote" />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="workType">Work Type</label>
+                <div class="input-icon-wrap select-icon-wrap">
+                  <i class="fa-solid fa-briefcase input-icon"></i>
+                  <select id="workType">
+                    <option value="" disabled>Select Work Type</option>
+                    <option>Remote</option>
+                    <option>On-site</option>
+                    <option>Hybrid</option>
+                  </select>
+                  <i class="fa-solid fa-chevron-down select-chevron"></i>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Skills -->
+          <div class="card animate-in" style="--delay:0.20s">
+            <h2><i class="fa-solid fa-laptop-code"></i> Skills</h2>
+
+            <p class="empty-message" id="noSkillsMessage">No skills added yet. Add your technical skills below.</p>
+
+            <div class="skills-wrap" id="skillsContainer"></div>
+
+            <div class="add-skill-row">
+              <div class="input-icon-wrap">
+                <i class="fa-solid fa-plus input-icon"></i>
+                <input
+                  type="text"
+                  id="skillInput"
+                  placeholder="Add a skill e.g. JavaScript, React, SQL"
+                />
+              </div>
+              <button type="button" id="addSkillBtn" class="add-skill-btn">
+                <i class="fa-solid fa-plus"></i> Add
+              </button>
+            </div>
+          </div>
+
+          <!-- Account Settings -->
+          <div class="card animate-in" style="--delay:0.23s">
+            <h2><i class="fa-solid fa-gear"></i> Account Settings</h2>
+
+            <div class="settings-row">
+              <div class="setting-item">
+                <div class="setting-info">
+                  <p class="setting-title">Password</p>
+                  <p class="setting-sub">Change your account password</p>
+                </div>
+                <button class="btn-setting btn-change-pass" id="changePassBtn" type="button">
+                  <i class="fa-solid fa-key"></i> Change Password
+                </button>
+              </div>
+
+              <div class="setting-item setting-danger">
+                <div class="setting-info">
+                  <p class="setting-title">Delete Account</p>
+                  <p class="setting-sub">Permanently remove your account and all data</p>
+                </div>
+                <button class="btn-setting btn-delete-acc delete-btn" type="button">
+                  <i class="fa-solid fa-trash"></i> Delete Account
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Status Message -->
+          <p id="profileStatus" class="status-msg" style="display:none"></p>
+
         </div>
       </div>
 
-      <div class="section-card">
-        <h2><i class="fa-solid fa-file-lines"></i> Resume</h2>
-
-        <div class="resume-box">
-          <span id="resumeFileName">
-            <i class="fa-solid fa-circle-info"></i>
-            No resume uploaded yet
-          </span>
-
-          <div class="resume-actions">
-            <button class="view-btn" id="viewResumeBtn" type="button" disabled>
-              <i class="fa-solid fa-eye"></i>
-              View
-            </button>
-
-            <label for="resumeInput" class="update-btn">
-              <i class="fa-solid fa-upload"></i>
-              Upload Resume
-            </label>
-
-            <input
-              type="file"
-              id="resumeInput"
-              accept=".pdf,.doc,.docx"
-              hidden
-            />
-          </div>
-        </div>
-      </div>
-
-      <div class="section-card">
-        <h2><i class="fa-solid fa-laptop-code"></i> Skills</h2>
-
-        <p class="empty-message" id="noSkillsMessage">No skills added yet</p>
-
-        <div class="skills" id="skillsContainer"></div>
-
-        <div class="add-skill-box">
-          <input
-            type="text"
-            id="skillInput"
-            placeholder="Add a skill e.g. JavaScript"
-          />
-
-          <button type="button" id="addSkillBtn">
-            <i class="fa-solid fa-plus"></i>
-            Add Skill
-          </button>
-        </div>
-      </div>
-
-      <div class="section-card">
-        <h2><i class="fa-solid fa-bullseye"></i> Career Preferences</h2>
-
-        <div class="profile-info">
-          <div class="input-group">
-            <label>
-              <i class="fa-solid fa-laptop-code"></i>
-              Preferred Role
-            </label>
-            <input
-              type="text"
-              id="preferredRole"
-              placeholder="Software Engineer, Data Analyst..."
-            />
-          </div>
-
-          <div class="input-group">
-            <label>
-              <i class="fa-solid fa-indian-rupee-sign"></i>
-              Expected Package
-            </label>
-            <input
-              type="text"
-              id="expectedPackage"
-              placeholder="e.g. 6 LPA, 10 LPA"
-            />
-          </div>
-
-          <div class="input-group">
-            <label>
-              <i class="fa-solid fa-location-dot"></i>
-              Preferred Location
-            </label>
-            <input
-              type="text"
-              id="preferredLocation"
-              placeholder="Delhi, Bangalore, Remote..."
-            />
-          </div>
-
-          <div class="input-group">
-            <label>
-              <i class="fa-solid fa-briefcase"></i>
-              Work Type
-            </label>
-            <select id="workType">
-              <option value="" selected disabled>Select Work Type</option>
-              <option>Remote</option>
-              <option>On-site</option>
-              <option>Hybrid</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      <div class="section-card">
-        <h2><i class="fa-solid fa-gear"></i> Account Settings</h2>
-
-        <div class="settings-buttons">
-          <button class="change-btn" id="changePassBtn" type="button">
-            <i class="fa-solid fa-key"></i>
-            Change Password
-          </button>
-
-          <button class="delete-btn" type="button">
-            <i class="fa-solid fa-trash"></i>
-            Delete Account
-          </button>
-        </div>
-      </div>
-
-      <p id="profileStatus" class="status-msg" style="display: none"></p>
-
-      <button class="save-btn" id="saveProfileBtn" type="button">
-        <i class="fa-solid fa-floppy-disk"></i>
-        Save Profile
-      </button>
-    </div>
+    </main>
 
     <!-- ── Change Password Modal ── -->
-    <div class="modal-overlay" id="changePassModal">
+    <div class="modal-overlay" id="changePassModal" role="dialog" aria-modal="true">
       <div class="modal-box">
         <div class="modal-header">
           <h3><i class="fa-solid fa-key"></i> Change Password</h3>
@@ -300,27 +339,33 @@
         </div>
 
         <div class="modal-body">
-          <div class="input-group">
+          <div class="form-group">
             <label><i class="fa-solid fa-lock"></i> Current Password</label>
             <div class="pass-input-wrap">
               <input type="password" id="currentPass" placeholder="Enter current password" />
-              <button type="button" class="toggle-eye" data-target="currentPass"><i class="fa-solid fa-eye"></i></button>
+              <button type="button" class="toggle-eye" data-target="currentPass">
+                <i class="fa-solid fa-eye"></i>
+              </button>
             </div>
           </div>
 
-          <div class="input-group">
+          <div class="form-group">
             <label><i class="fa-solid fa-lock-open"></i> New Password</label>
             <div class="pass-input-wrap">
-              <input type="password" id="newPass" placeholder="Enter new password" />
-              <button type="button" class="toggle-eye" data-target="newPass"><i class="fa-solid fa-eye"></i></button>
+              <input type="password" id="newPass" placeholder="Enter new password (min 6 chars)" />
+              <button type="button" class="toggle-eye" data-target="newPass">
+                <i class="fa-solid fa-eye"></i>
+              </button>
             </div>
           </div>
 
-          <div class="input-group">
+          <div class="form-group">
             <label><i class="fa-solid fa-shield-halved"></i> Confirm Password</label>
             <div class="pass-input-wrap">
               <input type="password" id="confirmPass" placeholder="Confirm new password" />
-              <button type="button" class="toggle-eye" data-target="confirmPass"><i class="fa-solid fa-eye"></i></button>
+              <button type="button" class="toggle-eye" data-target="confirmPass">
+                <i class="fa-solid fa-eye"></i>
+              </button>
             </div>
           </div>
 
@@ -337,7 +382,7 @@
     </div>
 
     <!-- ── Delete Account Modal ── -->
-    <div class="modal-overlay" id="deleteAccModal">
+    <div class="modal-overlay" id="deleteAccModal" role="dialog" aria-modal="true">
       <div class="modal-box modal-danger">
         <div class="modal-header">
           <h3><i class="fa-solid fa-triangle-exclamation"></i> Delete Account</h3>
@@ -347,11 +392,12 @@
         </div>
 
         <div class="modal-body">
-          <p class="delete-warning">
-            ⚠️ This action is <strong>permanent</strong> and cannot be undone. All your applications, interviews, and data will be deleted forever.
-          </p>
+          <div class="delete-warning">
+            ⚠️ This action is <strong>permanent</strong> and cannot be undone. All your applications,
+            interviews, and data will be deleted forever.
+          </div>
 
-          <div class="input-group">
+          <div class="form-group" style="margin-top:18px">
             <label><i class="fa-solid fa-lock"></i> Enter your password to confirm</label>
             <div class="pass-input-wrap">
               <input type="password" id="deleteConfirmPass" placeholder="Enter your password" />
@@ -372,6 +418,9 @@
         </div>
       </div>
     </div>
+
+    <!-- ── Toast ── -->
+    <div class="toast" id="globalToast"></div>
 
     <script src="../js/dataService.js"></script>
     <script src="../js/profile.js"></script>

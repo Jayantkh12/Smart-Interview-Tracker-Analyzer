@@ -181,3 +181,15 @@ CREATE TABLE IF NOT EXISTS QuestionPractice (
     FOREIGN KEY (user_id) REFERENCES Users(id),
     FOREIGN KEY (question_id) REFERENCES Questions(question_id)
 );
+
+
+-- ============================================================
+-- PASSWORD FORGOT
+-- ============================================================
+CREATE TABLE password_resets (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT,
+    token VARCHAR(255),
+    expires_at DATETIME,
+    FOREIGN KEY(user_id) REFERENCES users(id)
+);

@@ -8,7 +8,9 @@
 const BASE = "http://localhost:5500";
 
 // ── Auth guard ──────────────────────────────────────────────
-const user = JSON.parse(localStorage.getItem("user"));
+const user = JSON.parse(
+  localStorage.getItem("user") || sessionStorage.getItem("user"),
+);
 if (!user) {
   window.location.href = "./login.html";
 }
@@ -23,11 +25,18 @@ document.getElementById("menuBtn")?.addEventListener("click", () => {
   document.getElementById("navLinks")?.classList.toggle("active");
 });
 
+document.getElementById("logoutBtn")?.addEventListener("click", (e) => {
+  e.preventDefault();
+  localStorage.removeItem("user");
+  sessionStorage.removeItem("user");
+  window.location.href = "../index.html";
+});
+
 // ── Time filter ──────────────────────────────────────────────
 document.getElementById("timeFilter")?.addEventListener("change", loadAnalytics);
 
-// ── Export CSV ───────────────────────────────────────────────
-document.getElementById("exportBtn")?.addEventListener("click", exportCSV);
+// ── Export PDF ───────────────────────────────────────────────
+document.getElementById("exportBtn")?.addEventListener("click", exportPDF);
 
 // ── On load ──────────────────────────────────────────────────
 window.addEventListener("DOMContentLoaded", loadAnalytics);
@@ -614,36 +623,369 @@ function renderQuestionsLog(data) {
 
 
 // ============================================================
-// EXPORT CSV
+// EXPORT PDF
 // ============================================================
-async function exportCSV() {
+async function exportPDF() {
+  const exportBtn = document.getElementById("exportBtn");
+  if (!exportBtn) return;
+  const originalHtml = exportBtn.innerHTML;
+  
   try {
-    const res  = await fetch(`${BASE}/api/applications/${user.id}`);
-    const apps = await res.json();
+    // Show spinner during PDF generation
+    exportBtn.disabled = true;
+    exportBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Generating PDF…';
 
-    const months = parseInt(document.getElementById("timeFilter")?.value) || 0;
-    const filtered = filterByMonths(apps, months, "application_date");
+    const totalApps = document.getElementById("analyticsTotal")?.textContent || "0";
+    const scheduled = document.getElementById("analyticsInterviews")?.textContent || "0";
+    const offers = document.getElementById("analyticsOffers")?.textContent || "0";
+    const rejected = document.getElementById("analyticsRejected")?.textContent || "0";
+    const conversionRate = document.getElementById("conversionRate")?.textContent || "0%";
+    const interviewRate = document.getElementById("interviewRate")?.textContent || "0%";
+    const avgDays = document.getElementById("avgDaysToInterview")?.textContent || "0";
+    const oaCleared = document.getElementById("analyticsOACleared")?.textContent || "0";
 
-    const headers = ["Company", "Role", "Status", "Application Date", "Package (LPA)"];
-    const rows = filtered.map(a => [
-      `"${(a.company_name || "").replace(/"/g, '""')}"`,
-      `"${(a.role        || "").replace(/"/g, '""')}"`,
-      `"${(a.status      || "").replace(/"/g, '""')}"`,
-      a.application_date || "",
-      a.package_lpa || "",
-    ]);
+    const topCompaniesHtml = document.getElementById("topCompanies")?.innerHTML || "";
+    const questionsLogHtml = document.getElementById("questionsLog")?.innerHTML || "";
+    
+    // Get charts as images
+    const statusDonutImg = statusDonutInstance ? statusDonutInstance.toBase64Image() : null;
+    const monthlyBarImg = monthlyBarInstance ? monthlyBarInstance.toBase64Image() : null;
+    const roundsBarImg = roundsBarInstance ? roundsBarInstance.toBase64Image() : null;
 
-    const csv = [headers.join(","), ...rows.map(r => r.join(","))].join("\n");
-    const blob = new Blob([csv], { type: "text/csv" });
-    const url  = URL.createObjectURL(blob);
-    const a    = document.createElement("a");
-    a.href     = url;
-    a.download = `applications_${new Date().toISOString().slice(0, 10)}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
+    const timePeriodLabel = document.getElementById("timeFilter")?.options[document.getElementById("timeFilter").selectedIndex]?.text || "All Time";
+
+    // Create temporary styled container for PDF
+    const element = document.createElement("div");
+    element.className = "pdf-report-container";
+    
+    element.innerHTML = `
+      <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+        .pdf-body {
+          font-family: 'Poppins', sans-serif;
+          color: #0f172a;
+          background: #ffffff;
+          padding: 24px;
+          line-height: 1.5;
+        }
+        .pdf-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          border-bottom: 2px solid #6c63ff;
+          padding-bottom: 16px;
+          margin-bottom: 24px;
+        }
+        .pdf-title-area h1 {
+          font-size: 24px;
+          font-weight: 800;
+          color: #1e1b4b;
+          margin: 0;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+        .pdf-title-area p {
+          font-size: 13px;
+          color: #64748b;
+          margin: 4px 0 0 0;
+        }
+        .pdf-meta {
+          text-align: right;
+          font-size: 11px;
+          color: #64748b;
+        }
+        .pdf-section-title {
+          font-size: 15px;
+          font-weight: 700;
+          color: #1e1b4b;
+          margin: 20px 0 12px 0;
+          padding-bottom: 6px;
+          border-bottom: 1px solid #e2e8f0;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+        }
+        .pdf-stats-grid {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 12px;
+          margin-bottom: 20px;
+        }
+        .pdf-stat-card {
+          background: #f8fafc;
+          border: 1px solid #e2e8f0;
+          border-radius: 8px;
+          padding: 12px;
+          text-align: center;
+        }
+        .pdf-stat-card h4 {
+          font-size: 10px;
+          text-transform: uppercase;
+          color: #64748b;
+          margin: 0 0 4px 0;
+          letter-spacing: 0.5px;
+        }
+        .pdf-stat-card p {
+          font-size: 18px;
+          font-weight: 700;
+          color: #6c63ff;
+          margin: 0;
+        }
+        .pdf-charts-row {
+          display: flex;
+          gap: 16px;
+          margin-bottom: 20px;
+        }
+        .pdf-chart-box {
+          flex: 1;
+          background: #ffffff;
+          border: 1px solid #e2e8f0;
+          border-radius: 10px;
+          padding: 16px;
+          text-align: center;
+        }
+        .pdf-chart-box.flex-2 {
+          flex: 2;
+        }
+        .pdf-chart-box h3 {
+          font-size: 12px;
+          font-weight: 600;
+          color: #1e1b4b;
+          margin: 0 0 12px 0;
+          text-align: left;
+        }
+        .pdf-chart-img {
+          max-height: 200px;
+          max-width: 100%;
+          object-fit: contain;
+        }
+        .company-list {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+        }
+        .company-row {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          padding: 8px 12px;
+          background: #f8fafc;
+          border: 1px solid #e2e8f0;
+          border-radius: 8px;
+        }
+        .company-rank {
+          font-size: 11px;
+          font-weight: 800;
+          min-width: 24px;
+          text-align: center;
+        }
+        .rank-1 { color: #d97706; }
+        .rank-2 { color: #64748b; }
+        .rank-3 { color: #b45309; }
+        .rank-other { color: #64748b; }
+        .company-avatar {
+          width: 28px;
+          height: 28px;
+          border-radius: 6px;
+          background: #e0e7ff;
+          border: 1px solid #c7d2fe;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 11px;
+          font-weight: 700;
+          color: #4f46e5;
+          flex-shrink: 0;
+        }
+        .company-name {
+          flex: 1;
+          font-weight: 600;
+          font-size: 12px;
+          color: #1e293b;
+        }
+        .company-status-bar {
+          width: 80px;
+          height: 6px;
+          background: #e2e8f0;
+          border-radius: 999px;
+          overflow: hidden;
+        }
+        .company-status-fill {
+          height: 100%;
+          border-radius: 999px;
+          background: linear-gradient(90deg, #6c63ff, #38bdf8);
+        }
+        .company-count {
+          font-size: 11px;
+          color: #64748b;
+          font-weight: 600;
+          white-space: nowrap;
+        }
+        .pdf-questions-log {
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+        }
+        .question-card {
+          background: #f8fafc;
+          border: 1px solid #e2e8f0;
+          border-radius: 8px;
+          padding: 12px;
+          font-size: 11px;
+          page-break-inside: avoid;
+          break-inside: avoid;
+          margin-bottom: 10px;
+        }
+        .question-header {
+          display: flex;
+          justify-content: space-between;
+          font-weight: 700;
+          color: #1e1b4b;
+          border-bottom: 1px solid #e2e8f0;
+          padding-bottom: 6px;
+          margin-bottom: 8px;
+        }
+        .question-company {
+          font-size: 12px;
+          color: #6c63ff;
+        }
+        .question-role {
+          font-size: 11px;
+          color: #64748b;
+        }
+        .question-body {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+        }
+        .question-section label {
+          font-weight: 600;
+          color: #475569;
+          text-transform: uppercase;
+          font-size: 9px;
+          display: block;
+          margin-bottom: 2px;
+        }
+        .question-section p {
+          margin: 0;
+          color: #1e293b;
+        }
+        .html2pdf__page-break {
+          page-break-before: always;
+          break-before: always;
+        }
+        .empty {
+          color: #94a3b8;
+          font-size: 11px;
+          font-style: italic;
+          text-align: center;
+          margin: 12px 0;
+        }
+      </style>
+      <div class="pdf-body">
+        <div class="pdf-header">
+          <div class="pdf-title-area">
+            <h1>InterviewTracker</h1>
+            <p>Smart Placement Analytics &amp; Performance Report</p>
+          </div>
+          <div class="pdf-meta">
+            <strong>Candidate:</strong> ${escHtml(user.name)} (${escHtml(user.email)})<br/>
+            <strong>Filter Period:</strong> ${escHtml(timePeriodLabel)}<br/>
+            <strong>Generated:</strong> ${new Date().toLocaleDateString()}
+          </div>
+        </div>
+
+        <div class="pdf-section-title">Key Performance Indicators</div>
+        <div class="pdf-stats-grid">
+          <div class="pdf-stat-card">
+            <h4>Total Applied</h4>
+            <p>${escHtml(totalApps)}</p>
+          </div>
+          <div class="pdf-stat-card">
+            <h4>Interviews</h4>
+            <p>${escHtml(scheduled)}</p>
+          </div>
+          <div class="pdf-stat-card">
+            <h4>Offers Received</h4>
+            <p>${escHtml(offers)}</p>
+          </div>
+          <div class="pdf-stat-card">
+            <h4>Rejections</h4>
+            <p>${escHtml(rejected)}</p>
+          </div>
+          <div class="pdf-stat-card">
+            <h4>Offer Rate</h4>
+            <p>${escHtml(conversionRate)}</p>
+          </div>
+          <div class="pdf-stat-card">
+            <h4>Interview Rate</h4>
+            <p>${escHtml(interviewRate)}</p>
+          </div>
+          <div class="pdf-stat-card">
+            <h4>Avg. Days to Interview</h4>
+            <p>${escHtml(avgDays)}</p>
+          </div>
+          <div class="pdf-stat-card">
+            <h4>OA Cleared</h4>
+            <p>${escHtml(oaCleared)}</p>
+          </div>
+        </div>
+
+        <div class="pdf-section-title">Distribution &amp; Trends</div>
+        <div class="pdf-charts-row">
+          <div class="pdf-chart-box">
+            <h3>Status Distribution</h3>
+            ${statusDonutImg ? `<img src="${statusDonutImg}" class="pdf-chart-img" alt="Status Distribution"/>` : '<p class="empty">No status data available</p>'}
+          </div>
+          <div class="pdf-chart-box flex-2">
+            <h3>Applications Timeline</h3>
+            ${monthlyBarImg ? `<img src="${monthlyBarImg}" class="pdf-chart-img" alt="Applications Timeline"/>` : '<p class="empty">No monthly data available</p>'}
+          </div>
+        </div>
+
+        ${roundsBarImg ? `
+        <div class="pdf-charts-row">
+          <div class="pdf-chart-box">
+            <h3>Interview Rounds Breakdown</h3>
+            <img src="${roundsBarImg}" class="pdf-chart-img" alt="Rounds Breakdown"/>
+          </div>
+        </div>
+        ` : ""}
+
+        <div class="html2pdf__page-break"></div>
+
+        <div class="pdf-section-title">Target Companies &amp; Top Pipeline</div>
+        <div class="pdf-list-box" style="margin-bottom: 24px;">
+          <h3>Top Companies Applied</h3>
+          <div class="company-list">
+            ${topCompaniesHtml.includes("empty") || !topCompaniesHtml.trim() ? '<p class="empty">No company applications logged yet</p>' : topCompaniesHtml}
+          </div>
+        </div>
+
+        <div class="pdf-section-title">Interview Questions &amp; Preparation Log</div>
+        <div class="pdf-questions-log">
+          ${questionsLogHtml.includes("empty") || !questionsLogHtml.trim() ? '<p class="empty">No questions or preparation notes logged yet</p>' : questionsLogHtml}
+        </div>
+      </div>
+    `;
+
+    const opt = {
+      margin:       [8, 8, 8, 8],
+      filename:     `placement_report_${new Date().toISOString().slice(0, 10)}.pdf`,
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 2, useCORS: true, letterRendering: true, backgroundColor: '#ffffff' },
+      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+
+    await html2pdf().set(opt).from(element).save();
+
   } catch (err) {
-    console.error("Export failed:", err);
-    alert("Export failed. Please try again.");
+    console.error("PDF Export failed:", err);
+    alert("Failed to export PDF. Please try again.");
+  } finally {
+    exportBtn.disabled = false;
+    exportBtn.innerHTML = originalHtml;
   }
 }
 

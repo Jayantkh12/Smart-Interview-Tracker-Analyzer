@@ -5,10 +5,11 @@
 
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap");
 
-/* ── Reset ── */
 *, *::before, *::after {
   margin: 0; padding: 0;
   box-sizing: border-box;
+}
+body, input, select, textarea, button {
   font-family: "Poppins", sans-serif;
 }
 html { scroll-behavior: smooth; }
@@ -663,3 +664,54 @@ ul { list-style: none; }
 .toast.show { opacity: 1; transform: translateY(0); }
 .toast.toast-success { border-left: 4px solid #34d399; }
 .toast.toast-error { border-left: 4px solid #f87171; }
+
+/* ── Skeleton Loading ── */
+.summary-skeleton { display: grid; gap: 12px; }
+.skeleton-row {
+  height: 20px;
+  background: linear-gradient(90deg,
+    rgba(255,255,255,0.04) 25%,
+    rgba(255,255,255,0.08) 50%,
+    rgba(255,255,255,0.04) 75%
+  );
+  background-size: 200% 100%;
+  border-radius: 999px;
+  animation: shimmer 1.5s infinite;
+}
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ── Goal Tracker ── */
+.goal-progress-wrap { margin-top: 14px; }
+.goal-progress-bar {
+  height: 10px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+.goal-progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #6c63ff, #38bdf8);
+  transition: width 0.9s cubic-bezier(0.25,0.46,0.45,0.94);
+  box-shadow: 0 0 10px rgba(108,99,255,0.4);
+}
+.goal-hint {
+  font-size: 0.8rem;
+  color: #64748b;
+  text-align: center;
+}
+
+/* ── Stat Trend ── */
+.stat-trend {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 999px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+

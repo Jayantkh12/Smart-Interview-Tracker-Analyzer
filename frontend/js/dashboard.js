@@ -3,13 +3,15 @@
 // ============================================================
 // Fetches all dashboard data from the backend API at localhost:5500
 // and renders: stats, recent applications, upcoming interviews,
-// resume info, and status summary bars.
+// resume info, status summary, and question analytics.
 // ============================================================
 
 const BASE = "http://localhost:5500";
 
 // ── Auth guard ───────────────────────────────────────────────
-const user = JSON.parse(localStorage.getItem("user"));
+const user = JSON.parse(
+  localStorage.getItem("user") || sessionStorage.getItem("user"),
+);
 if (!user) {
   window.location.href = "./login.html";
 }
@@ -35,6 +37,7 @@ document.getElementById("menuBtn")?.addEventListener("click", () => {
 document.getElementById("logoutBtn")?.addEventListener("click", (e) => {
   e.preventDefault();
   localStorage.removeItem("user");
+  sessionStorage.removeItem("user");
   window.location.href = "../index.html";
 });
 
@@ -48,6 +51,7 @@ window.addEventListener("DOMContentLoaded", () => {
   loadRecentQuestions();
   loadResumeAnalytics();
   loadDifficultyBreakdown();
+  loadWeeklyGoal();
   initQuestionModal();
 });
 
@@ -99,12 +103,12 @@ function initQuestionModal() {
         method:  "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          userId:     user.id,
+          userId:       user.id,
           questionText: qText,
-          topic:      qTopic  || "General",
+          topic:        qTopic  || "General",
           difficulty,
-          company:    qCompany || null,
-          notes:      qNotes   || null,
+          company:      qCompany || null,
+          notes:        qNotes   || null,
         }),
       });
 
@@ -154,9 +158,6 @@ function showToast(message, type = "success") {
 }
 
 
-});
-
-
 // ============================================================
 // 1. DASHBOARD STATS
 // ============================================================
@@ -169,6 +170,9 @@ async function loadDashboardStats() {
     animateCount("dashboardInterviews",        data.interview || 0);
     animateCount("dashboardOffers",            data.offers    || 0);
     animateCount("dashboardRejections",        data.rejected  || 0);
+
+    // Render status summary bars in the right column
+    renderStatusSummary(data);
 
   } catch (err) {
     console.error("[dashboard] stats error:", err);
@@ -314,11 +318,11 @@ function renderStatusSummary(stats) {
   if (!el) return;
 
   const rows = [
-    { label: "Applied",               count: stats.applied   || 0, cls: "bar-applied"             },
-    { label: "OA Cleared",            count: stats.oaCleared || 0, cls: "bar-oa-cleared"          },
-    { label: "Interview Scheduled",   count: stats.interview || 0, cls: "bar-interview-scheduled" },
-    { label: "Selected",              count: stats.offers    || 0, cls: "bar-selected"            },
-    { label: "Rejected",              count: stats.rejected  || 0, cls: "bar-rejected"            },
+    { label: "Applied",              count: stats.applied   || 0, cls: "bar-applied"             },
+    { label: "OA Cleared",           count: stats.oaCleared || 0, cls: "bar-oa-cleared"          },
+    { label: "Interview Scheduled",  count: stats.interview || 0, cls: "bar-interview-scheduled" },
+    { label: "Selected",             count: stats.offers    || 0, cls: "bar-selected"            },
+    { label: "Rejected",             count: stats.rejected  || 0, cls: "bar-rejected"            },
   ];
 
   const total = Math.max(stats.total || 1, 1);
@@ -392,64 +396,117 @@ async function loadQuestionAnalysis() {
   const el = document.getElementById("questionAnalysis");
   if (!el) return;
   try {
-    const res  = await fetch(`${BASE}/api/analytics/questions/${user.id}`);
+    const res  = await fetch(`${BASE}/api/questions/user/${user.id}`);
     const data = await res.json();
+
     if (!Array.isArray(data) || data.length === 0) {
-      el.innerHTML = '<p class="empty">No interview question data yet.</p>';
+      // Fallback to analytics endpoint
+      try {
+        const res2  = await fetch(`${BASE}/api/analytics/questions/${user.id}`);
+        const data2 = await res2.json();
+        if (!Array.isArray(data2) || data2.length === 0) {
+          el.innerHTML = '<p class="empty">No interview question data yet.</p>';
+          return;
+        }
+        renderTopicAnalysis(el, data2.map(d => d.questions_asked || ""));
+      } catch {
+        el.innerHTML = '<p class="empty">No interview question data yet.</p>';
+      }
       return;
     }
-    // Count by topic keyword frequency
-    const topicMap = {};
-    data.forEach(item => {
-      const text = (item.questions_asked || "").toLowerCase();
-      const keywords = ["array","string","tree","graph","dp","sql","system design",
-                        "oop","os","dbms","react","javascript","python","java","api"];
-      keywords.forEach(kw => {
-        if (text.includes(kw)) topicMap[kw] = (topicMap[kw] || 0) + 1;
-      });
-    });
-    const sorted = Object.entries(topicMap).sort(([,a],[,b]) => b - a).slice(0, 8);
-    if (sorted.length === 0) {
-      el.innerHTML = '<p class="empty">No topic data extracted yet.</p>';
-      return;
-    }
-    el.innerHTML = sorted.map(([topic, count]) =>
-      `<div class="qa-item">
-        <span class="qa-topic">${topic.toUpperCase()}</span>
-        <span class="qa-count">${count} mention${count !== 1 ? "s" : ""}</span>
-      </div>`
-    ).join("");
-    el.className = "";
+
+    renderTopicAnalysis(el, data.map(d => `${d.question_text || ""} ${d.topic || ""}`));
   } catch (err) {
-    console.error("[dashboard] question analysis:", err);
-    el.textContent = "Could not load question analysis.";
+    // Fallback: use analytics endpoint
+    try {
+      const res2  = await fetch(`${BASE}/api/analytics/questions/${user.id}`);
+      const data2 = await res2.json();
+      if (!Array.isArray(data2) || data2.length === 0) {
+        el.innerHTML = '<p class="empty">No interview question data yet.</p>';
+        return;
+      }
+      renderTopicAnalysis(el, data2.map(d => d.questions_asked || ""));
+    } catch {
+      el.innerHTML = '<p class="empty">No interview question data yet.</p>';
+    }
   }
+}
+
+function renderTopicAnalysis(el, textArray) {
+  const topicMap = {};
+  const keywords = ["array","string","tree","graph","dp","sql","system design",
+                    "oop","os","dbms","react","javascript","python","java","api",
+                    "linked list","sorting","binary search","recursion","general"];
+  textArray.forEach(text => {
+    const lower = (text || "").toLowerCase();
+    keywords.forEach(kw => {
+      if (lower.includes(kw)) topicMap[kw] = (topicMap[kw] || 0) + 1;
+    });
+  });
+  const sorted = Object.entries(topicMap).sort(([,a],[,b]) => b - a).slice(0, 8);
+  if (sorted.length === 0) {
+    el.innerHTML = '<p class="empty">No topic data extracted yet.</p>';
+    return;
+  }
+  el.innerHTML = sorted.map(([topic, count]) =>
+    `<div class="qa-item">
+      <span class="qa-topic">${topic.toUpperCase()}</span>
+      <span class="qa-count">${count} mention${count !== 1 ? "s" : ""}</span>
+    </div>`
+  ).join("");
+  el.className = "";
 }
 
 
 // ============================================================
-// 7. RECENTLY ASKED QUESTIONS
+// 7. RECENTLY ASKED QUESTIONS (from QuestionPractice table)
 // ============================================================
 async function loadRecentQuestions() {
   const el = document.getElementById("recentQuestions");
   if (!el) return;
   try {
-    const res  = await fetch(`${BASE}/api/analytics/questions/${user.id}`);
+    const res  = await fetch(`${BASE}/api/questions/user/${user.id}`);
     const data = await res.json();
+
     if (!Array.isArray(data) || data.length === 0) {
-      el.innerHTML = '<p class="empty">No questions recorded yet.</p>';
+      el.innerHTML = '<p class="empty">No questions recorded yet. Use "Add Question" to log one!</p>';
       return;
     }
-    el.innerHTML = data.slice(0, 4).map(item =>
-      `<div class="q-card">
-        <div class="q-card-company">${escHtml(item.company_name || "Unknown")}</div>
-        ${item.role ? `<span class="q-card-role">${escHtml(item.role)}</span>` : ""}
-        <p class="q-card-text">${escHtml(item.questions_asked || "").replace(/\n/g, "<br>")}</p>
-      </div>`
-    ).join("");
+
+    el.innerHTML = data.slice(0, 4).map(item => {
+      const diffColor = {
+        "Easy":   "#34d399",
+        "Medium": "#facc15",
+        "Hard":   "#f87171",
+      }[item.difficulty] || "#a78bfa";
+
+      return `<div class="q-card">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
+          <div class="q-card-company">${escHtml(item.topic || "General")}</div>
+          <span style="font-size:0.72rem;font-weight:700;color:${diffColor};background:rgba(255,255,255,0.05);border:1px solid ${diffColor}33;padding:2px 9px;border-radius:999px;">${escHtml(item.difficulty || "")}</span>
+        </div>
+        <p class="q-card-text">${escHtml(item.question_text || "").replace(/\n/g, "<br>")}</p>
+      </div>`;
+    }).join("");
   } catch (err) {
-    console.error("[dashboard] recent questions:", err);
-    el.innerHTML = '<p class="empty">Could not load questions.</p>';
+    // Fallback to analytics questions endpoint
+    try {
+      const res2  = await fetch(`${BASE}/api/analytics/questions/${user.id}`);
+      const data2 = await res2.json();
+      if (!Array.isArray(data2) || data2.length === 0) {
+        el.innerHTML = '<p class="empty">No questions recorded yet.</p>';
+        return;
+      }
+      el.innerHTML = data2.slice(0, 4).map(item =>
+        `<div class="q-card">
+          <div class="q-card-company">${escHtml(item.company_name || "Unknown")}</div>
+          ${item.role ? `<span class="q-card-role">${escHtml(item.role)}</span>` : ""}
+          <p class="q-card-text">${escHtml(item.questions_asked || "").replace(/\n/g, "<br>")}</p>
+        </div>`
+      ).join("");
+    } catch {
+      el.innerHTML = '<p class="empty">Could not load questions.</p>';
+    }
   }
 }
 
@@ -500,10 +557,58 @@ async function loadDifficultyBreakdown() {
     setEl("difficultyMedium", data.medium || 0);
     setEl("difficultyHard",   data.hard   || 0);
   } catch {
-    // Default to 0 — endpoint may not exist yet
     setEl("difficultyEasy",   0);
     setEl("difficultyMedium", 0);
     setEl("difficultyHard",   0);
+  }
+}
+
+
+// ============================================================
+// 10. WEEKLY GOAL TRACKER
+// ============================================================
+async function loadWeeklyGoal() {
+  const GOAL = 5;
+  const fillEl = document.getElementById("goalFill");
+  const badgeEl = document.getElementById("goalBadge");
+  const hintEl  = document.getElementById("goalHint");
+
+  try {
+    // Get applications from the past 7 days
+    const res  = await fetch(`${BASE}/api/analytics/monthly/${user.id}?months=1`);
+    const data = await res.json();
+
+    // Try to get weekly count from recent-applications
+    const res2   = await fetch(`${BASE}/api/applications/${user.id}`);
+    const apps   = await res2.json();
+
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+    const weeklyCount = Array.isArray(apps)
+      ? apps.filter(a => a.application_date && new Date(a.application_date) >= oneWeekAgo).length
+      : 0;
+
+    const pct = Math.min(Math.round((weeklyCount / GOAL) * 100), 100);
+
+    if (fillEl) {
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        fillEl.style.width = pct + "%";
+      }));
+    }
+    if (badgeEl) badgeEl.textContent = `${weeklyCount} / ${GOAL}`;
+    if (hintEl) {
+      if (weeklyCount >= GOAL) {
+        hintEl.textContent = "🎉 Weekly goal achieved! Keep going!";
+        hintEl.style.color = "#34d399";
+      } else {
+        const remaining = GOAL - weeklyCount;
+        hintEl.textContent = `${remaining} more application${remaining !== 1 ? "s" : ""} to reach your weekly goal`;
+      }
+    }
+  } catch (err) {
+    if (badgeEl) badgeEl.textContent = `0 / ${GOAL}`;
+    if (hintEl) hintEl.textContent = `Apply to ${GOAL} companies this week`;
   }
 }
 
