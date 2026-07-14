@@ -14,7 +14,11 @@ module.exports = {
     }
 
     try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET || "super_secret_interview_tracker_key_2026");
+      const secret = process.env.JWT_SECRET || (process.env.NODE_ENV === "production" ? null : "super_secret_interview_tracker_key_2026");
+      if (!secret) {
+        return res.status(500).json({ success: false, message: "Internal server security error." });
+      }
+      const decoded = jwt.verify(token, secret);
       req.user = decoded; // { userId }
       next();
     } catch (err) {

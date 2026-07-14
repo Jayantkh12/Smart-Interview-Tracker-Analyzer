@@ -61,9 +61,14 @@ exports.registerUser = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     const result = await User.create(name, phone, email, hashedPassword);
 
+    const secret = process.env.JWT_SECRET || (process.env.NODE_ENV === "production" ? null : "super_secret_interview_tracker_key_2026");
+    if (!secret) {
+      return res.status(500).json({ success: false, message: "Internal server security error." });
+    }
+
     const token = jwt.sign(
       { userId: result.insertId },
-      process.env.JWT_SECRET || "super_secret_interview_tracker_key_2026",
+      secret,
       { expiresIn: "7d" }
     );
 
@@ -98,9 +103,14 @@ exports.loginUser = async (req, res) => {
       return res.status(401).json({ success: false, message: "Invalid Password" });
     }
 
+    const secret = process.env.JWT_SECRET || (process.env.NODE_ENV === "production" ? null : "super_secret_interview_tracker_key_2026");
+    if (!secret) {
+      return res.status(500).json({ success: false, message: "Internal server security error." });
+    }
+
     const token = jwt.sign(
       { userId: users[0].id },
-      process.env.JWT_SECRET || "super_secret_interview_tracker_key_2026",
+      secret,
       { expiresIn: "7d" }
     );
 
