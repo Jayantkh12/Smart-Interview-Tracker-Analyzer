@@ -56,11 +56,68 @@ exports.registerUser = async (req, res) => {
     const existingUser = await User.findByEmail(email);
 
     if (existingUser.length > 0) {
-      return res.json({ message: "Email already registered" });
+      return res.status(400).json({ success: false, message: "Email already registered." });
     }
 
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes TTL
+
     const hashedPassword = await bcrypt.hash(password, 10);
-    const result = await User.create(name, phone, email, hashedPassword);
+    await User.createPending(name, phone, email, hashedPassword, otp, expiresAt);
+
+    await transporter.sendMail({
+      from: `"Smart Interview Tracker" <${process.env.GMAIL_USER}>`,
+      to: email,
+      subject: "Verify your email for InterviewTracker",
+      text: `Your email verification code is ${otp}. It expires in 10 minutes.`,
+      html: `
+        <div style="font-family:Arial,sans-serif;line-height:1.6;color:#0f172a;max-width:500px;margin:0 auto;border:1px solid #e2e8f0;border-radius:12px;padding:24px;">
+          <h2 style="color:#6c63ff;margin-top:0">Verify your InterviewTracker account</h2>
+          <p>Thank you for signing up! Use this verification code to complete your registration:</p>
+          <p style="font-size:32px;font-weight:700;letter-spacing:8px;text-align:center;color:#6c63ff;background:#f1f5f9;padding:12px;border-radius:8px;margin:24px 0">${otp}</p>
+          <p style="font-size:13px;color:#64748b;margin-bottom:0">This code expires in 10 minutes. If you did not request this, you can ignore this email.</p>
+        </div>
+      `,
+    });
+
+    res.json({
+      success: true,
+      message: "Verification code sent to your email.",
+      email
+    });
+  } catch (error) {
+    console.error("Register Error:", error);
+    res.status(500).json({ success: false, message: "Server Error" });
+  }
+};
+
+exports.verifyRegisterOTP = async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+    if (!email || !otp) {
+      return res.status(400).json({ success: false, message: "Email and OTP code are required." });
+    }
+
+    const pending = await User.findPendingByEmail(email);
+    if (pending.length === 0) {
+      return res.status(400).json({ success: false, message: "No pending registration found for this email address." });
+    }
+
+    const record = pending[0];
+
+    // Check expiry
+    if (new Date(record.expires_at) < new Date()) {
+      return res.status(400).json({ success: false, message: "Verification code has expired. Please request a new one." });
+    }
+
+    // Match OTP
+    if (record.otp_code !== otp) {
+      return res.status(400).json({ success: false, message: "Invalid verification code. Please try again." });
+    }
+
+    // Complete Registration
+    const result = await User.create(record.name, record.phoneNo, record.email, record.password);
+    await User.deletePendingByEmail(email);
 
     const secret = process.env.JWT_SECRET || (process.env.NODE_ENV === "production" ? null : "super_secret_interview_tracker_key_2026");
     if (!secret) {
@@ -75,16 +132,59 @@ exports.registerUser = async (req, res) => {
 
     res.json({
       success: true,
-      message: "Account Created Successfully",
+      message: "Email verified and account registered successfully!",
       token,
       user: {
         id: result.insertId,
-        name,
-        email,
+        name: record.name,
+        email: record.email,
       },
     });
   } catch (error) {
-    console.error(error);
+    console.error("Verify OTP Error:", error);
+    res.status(500).json({ success: false, message: "Server Error" });
+  }
+};
+
+exports.resendRegisterOTP = async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      return res.status(400).json({ success: false, message: "Email address is required." });
+    }
+
+    const pending = await User.findPendingByEmail(email);
+    if (pending.length === 0) {
+      return res.status(400).json({ success: false, message: "No pending registration found for this email." });
+    }
+
+    const record = pending[0];
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 mins
+
+    await User.createPending(record.name, record.phoneNo, record.email, record.password, otp, expiresAt);
+
+    await transporter.sendMail({
+      from: `"Smart Interview Tracker" <${process.env.GMAIL_USER}>`,
+      to: record.email,
+      subject: "New verification code for InterviewTracker",
+      text: `Your new email verification code is ${otp}. It expires in 10 minutes.`,
+      html: `
+        <div style="font-family:Arial,sans-serif;line-height:1.6;color:#0f172a;max-width:500px;margin:0 auto;border:1px solid #e2e8f0;border-radius:12px;padding:24px;">
+          <h2 style="color:#6c63ff;margin-top:0">Verify your InterviewTracker account</h2>
+          <p>You requested a new verification code. Use this code to complete your registration:</p>
+          <p style="font-size:32px;font-weight:700;letter-spacing:8px;text-align:center;color:#6c63ff;background:#f1f5f9;padding:12px;border-radius:8px;margin:24px 0">${otp}</p>
+          <p style="font-size:13px;color:#64748b;margin-bottom:0">This code expires in 10 minutes. If you did not request this, you can ignore this email.</p>
+        </div>
+      `,
+    });
+
+    res.json({
+      success: true,
+      message: "New verification code sent successfully."
+    });
+  } catch (error) {
+    console.error("Resend OTP Error:", error);
     res.status(500).json({ success: false, message: "Server Error" });
   }
 };

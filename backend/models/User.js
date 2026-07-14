@@ -55,6 +55,23 @@ const User = {
   updateProfilePhoto: async (userId, filename) => {
     const [result] = await db.query("UPDATE Users SET profile_photo=? WHERE id=?", [filename, userId]);
     return result;
+  },
+  createPending: async (name, phone, email, password, otp, expiresAt) => {
+    const [result] = await db.query(
+      `INSERT INTO pending_users (email, name, phoneNo, password, otp_code, expires_at) 
+       VALUES (?, ?, ?, ?, ?, ?) 
+       ON DUPLICATE KEY UPDATE name=?, phoneNo=?, password=?, otp_code=?, expires_at=?`,
+      [email, name, phone, password, otp, expiresAt, name, phone, password, otp, expiresAt]
+    );
+    return result;
+  },
+  findPendingByEmail: async (email) => {
+    const [rows] = await db.query("SELECT * FROM pending_users WHERE email = ?", [email]);
+    return rows;
+  },
+  deletePendingByEmail: async (email) => {
+    const [result] = await db.query("DELETE FROM pending_users WHERE email = ?", [email]);
+    return result;
   }
 };
 

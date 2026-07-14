@@ -9,6 +9,8 @@ router.post("/contact", authController.contactForm);
 
 // Auth endpoints
 router.post("/register", authController.registerUser);
+router.post("/verify-otp", authController.verifyRegisterOTP);
+router.post("/resend-otp", authController.resendRegisterOTP);
 router.post("/login", authController.loginUser);
 router.post("/forgot-password", authController.forgotPassword);
 router.post("/reset-password", authController.resetPassword);

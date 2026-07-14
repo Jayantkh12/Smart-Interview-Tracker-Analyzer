@@ -49,6 +49,7 @@ window.addEventListener("resize", () => {
 const registerForm = document.getElementById("registerForm");
 const errorBox     = document.getElementById("registerError");
 const registerBtn  = document.getElementById("registerBtn");
+let registeredEmail = "";
 
 registerForm?.addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -93,13 +94,10 @@ registerForm?.addEventListener("submit", async (e) => {
     const data = await response.json();
 
     if (data.success) {
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user || { id: data.userId, name, email }));
-      showToast("✅ Registration successful! Welcome aboard.", "success");
-      
-      setTimeout(() => {
-        window.location.href = "./profile.html";
-      }, 1200);
+      registeredEmail = email;
+      registerForm.style.display = "none";
+      if (otpVerifyForm) otpVerifyForm.style.display = "block";
+      showToast("✅ Verification code sent to your email!", "success");
     } else {
       showError(data.message || "Registration failed.");
       showToast(data.message || "Registration failed.", "error");
@@ -111,6 +109,92 @@ registerForm?.addEventListener("submit", async (e) => {
   } finally {
     registerBtn.disabled = false;
     registerBtn.innerHTML = '<i class="fa-solid fa-user-plus"></i> Register Account';
+  }
+});
+
+// ── OTP Verification Handling ───────────────────────────────
+const otpVerifyForm = document.getElementById("otpVerifyForm");
+const otpCodeInput  = document.getElementById("otpCode");
+const verifyBtn     = document.getElementById("verifyBtn");
+const otpErrorBox   = document.getElementById("otpError");
+const resendOtpLink = document.getElementById("resendOtpLink");
+
+function showOtpError(msg) {
+  if (!otpErrorBox) return;
+  otpErrorBox.textContent = msg;
+  otpErrorBox.style.display = "block";
+}
+function hideOtpError() {
+  if (!otpErrorBox) return;
+  otpErrorBox.style.display = "none";
+}
+
+otpVerifyForm?.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const otp = otpCodeInput.value.trim();
+
+  if (!otp || otp.length !== 6 || isNaN(otp)) {
+    showOtpError("Please enter a valid 6-digit verification code.");
+    return;
+  }
+
+  try {
+    hideOtpError();
+    verifyBtn.disabled = true;
+    verifyBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Verifying…';
+
+    const response = await fetch(`${API_URL}/verify-otp`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: registeredEmail, otp }),
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+      showToast("✅ Email verified! Redirecting…", "success");
+
+      setTimeout(() => {
+        window.location.href = "./profile.html";
+      }, 1200);
+    } else {
+      showOtpError(data.message || "Verification failed.");
+      showToast(data.message || "Verification failed.", "error");
+    }
+  } catch (err) {
+    console.error("OTP verification error:", err);
+    showOtpError("❌ Connection error. Try again later.");
+    showToast("❌ Connection error.", "error");
+  } finally {
+    verifyBtn.disabled = false;
+    verifyBtn.innerHTML = '<i class="fa-solid fa-circle-check"></i> Verify &amp; Register';
+  }
+});
+
+resendOtpLink?.addEventListener("click", async (e) => {
+  e.preventDefault();
+  if (!registeredEmail) return;
+
+  try {
+    showToast("Sending new code…", "success");
+    const response = await fetch(`${API_URL}/resend-otp`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: registeredEmail }),
+    });
+
+    const data = await response.json();
+    if (data.success) {
+      showToast("✅ New verification code sent!", "success");
+      hideOtpError();
+    } else {
+      showToast(data.message || "Failed to resend code.", "error");
+    }
+  } catch (err) {
+    console.error("Resend OTP error:", err);
+    showToast("❌ Connection error.", "error");
   }
 });
 

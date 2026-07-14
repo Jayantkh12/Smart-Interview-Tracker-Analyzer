@@ -172,6 +172,35 @@
               <a href="login.html">Login here</a>
             </div>
           </form>
+
+          <form id="otpVerifyForm" style="display: none" novalidate>
+            <div class="form-group">
+              <label for="otpCode">Verification Code <span class="req">*</span></label>
+              <p class="subtitle" style="margin-bottom: 16px; font-size: 13px; opacity: 0.85;">Enter the 6-digit verification code sent to your email.</p>
+              <div class="input-icon-wrap">
+                <i class="fa-solid fa-key input-icon"></i>
+                <input
+                  type="text"
+                  id="otpCode"
+                  placeholder="Enter 6-digit code"
+                  maxlength="6"
+                  pattern="[0-9]{6}"
+                  required
+                />
+              </div>
+            </div>
+
+            <button type="submit" id="verifyBtn" class="submit-btn">
+              <i class="fa-solid fa-circle-check"></i> Verify &amp; Register
+            </button>
+
+            <p id="otpError" class="form-error" style="display: none"></p>
+
+            <div class="register-link">
+              Didn't receive the code?
+              <a href="#" id="resendOtpLink">Resend Code</a>
+            </div>
+          </form>
         </div>
       </section>
 
