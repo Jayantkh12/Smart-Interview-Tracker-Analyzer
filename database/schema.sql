@@ -58,7 +58,7 @@ CREATE TABLE IF NOT EXISTS Applications (
     FOREIGN KEY (company_id) REFERENCES Companies(company_id)
 );
 
-CREATE INDEX IF NOT EXISTS idx_application_status ON Applications(status);
+CREATE INDEX idx_application_status ON Applications(status);
 
 -- ============================================================
 -- APPLICATION NOTES
@@ -191,5 +191,5 @@ CREATE TABLE password_resets (
     user_id INT,
     token VARCHAR(255),
     expires_at DATETIME,
-    FOREIGN KEY(user_id) REFERENCES users(id)
+    FOREIGN KEY(user_id) REFERENCES Users(id)
 );

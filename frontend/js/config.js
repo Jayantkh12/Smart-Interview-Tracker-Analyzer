@@ -14,7 +14,7 @@ const API_BASE = (
   window.location.hostname === "127.0.0.1"
 )
   ? "http://localhost:5500"
-  : "https://smart-interview-tracker-api.onrender.com"; // ← Replace with your Render URL after first deploy
+  : "https://smart-interview-tracker-backendsmart.onrender.com";
 
 // Expose globally so all page scripts can use it
 window.API_BASE = API_BASE;
