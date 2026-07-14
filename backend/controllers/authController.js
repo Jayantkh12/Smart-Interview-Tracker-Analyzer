@@ -65,7 +65,7 @@ exports.registerUser = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     await User.createPending(name, phone, email, hashedPassword, otp, expiresAt);
 
-    await transporter.sendMail({
+    transporter.sendMail({
       from: `"Smart Interview Tracker" <${process.env.GMAIL_USER}>`,
       to: email,
       subject: "Verify your email for InterviewTracker",
@@ -78,7 +78,7 @@ exports.registerUser = async (req, res) => {
           <p style="font-size:13px;color:#64748b;margin-bottom:0">This code expires in 10 minutes. If you did not request this, you can ignore this email.</p>
         </div>
       `,
-    });
+    }).catch(err => console.error("SMTP registration email error:", err));
 
     res.json({
       success: true,
@@ -164,7 +164,7 @@ exports.resendRegisterOTP = async (req, res) => {
 
     await User.createPending(record.name, record.phoneNo, record.email, record.password, otp, expiresAt);
 
-    await transporter.sendMail({
+    transporter.sendMail({
       from: `"Smart Interview Tracker" <${process.env.GMAIL_USER}>`,
       to: record.email,
       subject: "New verification code for InterviewTracker",
@@ -177,7 +177,7 @@ exports.resendRegisterOTP = async (req, res) => {
           <p style="font-size:13px;color:#64748b;margin-bottom:0">This code expires in 10 minutes. If you did not request this, you can ignore this email.</p>
         </div>
       `,
-    });
+    }).catch(err => console.error("SMTP resend email error:", err));
 
     res.json({
       success: true,
