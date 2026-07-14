@@ -67,7 +67,7 @@ exports.registerUser = async (req, res) => {
 
     console.log(`[Registration OTP] Sending code ${otp} to email: ${email}`);
 
-    await transporter.sendMail({
+    transporter.sendMail({
       from: `"Smart Interview Tracker" <${process.env.GMAIL_USER}>`,
       to: email,
       subject: "Verify your email for InterviewTracker",
@@ -80,7 +80,7 @@ exports.registerUser = async (req, res) => {
           <p style="font-size:13px;color:#64748b;margin-bottom:0">This code expires in 10 minutes. If you did not request this, you can ignore this email.</p>
         </div>
       `,
-    });
+    }).catch(err => console.error("SMTP registration email error:", err));
 
     res.json({
       success: true,
@@ -89,7 +89,7 @@ exports.registerUser = async (req, res) => {
     });
   } catch (error) {
     console.error("Register Error:", error);
-    res.status(500).json({ success: false, message: "Failed to send verification email. Please check your email address." });
+    res.status(500).json({ success: false, message: "Server Error" });
   }
 };
 
@@ -167,7 +167,7 @@ exports.resendRegisterOTP = async (req, res) => {
 
     console.log(`[Resend OTP] Sending code ${otp} to email: ${record.email}`);
 
-    await transporter.sendMail({
+    transporter.sendMail({
       from: `"Smart Interview Tracker" <${process.env.GMAIL_USER}>`,
       to: record.email,
       subject: "New verification code for InterviewTracker",
@@ -180,7 +180,7 @@ exports.resendRegisterOTP = async (req, res) => {
           <p style="font-size:13px;color:#64748b;margin-bottom:0">This code expires in 10 minutes. If you did not request this, you can ignore this email.</p>
         </div>
       `,
-    });
+    }).catch(err => console.error("SMTP resend email error:", err));
 
     res.json({
       success: true,
@@ -188,7 +188,7 @@ exports.resendRegisterOTP = async (req, res) => {
     });
   } catch (error) {
     console.error("Resend OTP Error:", error);
-    res.status(500).json({ success: false, message: "Failed to send new code. Please try again." });
+    res.status(500).json({ success: false, message: "Server Error" });
   }
 };
 
