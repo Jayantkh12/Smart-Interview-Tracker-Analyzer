@@ -104,9 +104,13 @@ async function loadProfile() {
 
     // Profile photo
     if (photoPreview) {
-      photoPreview.src = data.profilePic
-        ? data.profilePic + "?t=" + Date.now()
-        : DEFAULT_IMAGE;
+      if (data.profilePic) {
+        photoPreview.src = data.profilePic.startsWith("data:")
+          ? data.profilePic
+          : data.profilePic + "?t=" + Date.now();
+      } else {
+        photoPreview.src = DEFAULT_IMAGE;
+      }
     }
 
     // Hide "new user" message if profile is filled
@@ -216,7 +220,11 @@ photoInput?.addEventListener("change", async () => {
     const data = await res.json();
 
     if (data.success) {
-      if (photoPreview) photoPreview.src = data.imageUrl + "?t=" + Date.now();
+      if (photoPreview) {
+        photoPreview.src = data.imageUrl.startsWith("data:")
+          ? data.imageUrl
+          : data.imageUrl + "?t=" + Date.now();
+      }
       showToast("✅ Profile photo updated!", "success");
     } else {
       showToast(data.message || "Upload failed.", "error");
