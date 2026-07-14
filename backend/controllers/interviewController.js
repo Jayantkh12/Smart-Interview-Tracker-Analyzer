@@ -42,19 +42,11 @@ exports.getPublicStats = async (req, res) => {
     res.status(500).json({ success: false, message: "Server Error" });
   }
 };
-
 exports.getDashboardStats = async (req, res) => {
   try {
     const { userId } = req.params;
-    // Note: The original project dashboard stats returns static mocked numbers as fallback/default:
-    // applications: 1250, interviews: 850, offers: 320, rejections: 95
-    // Let's preserve that fallback structure or query results.
-    res.json({
-      applications: 1250,
-      interviews: 850,
-      offers: 320,
-      rejections: 95,
-    });
+    const stats = await Interview.getDashboardStats(userId);
+    res.json(stats);
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, message: "Server Error" });
@@ -180,11 +172,10 @@ exports.getApplicationDetails = async (req, res) => {
     res.status(500).json({ success: false, message: "Server Error" });
   }
 };
-
 exports.updateApplication = async (req, res) => {
   try {
     const { applicationId } = req.params;
-    const { status, companyName, role, packageLpa, applicationLink, notes } = req.body;
+    const { status, companyName, role, packageLpa, notes } = req.body;
 
     const app = await Interview.getApplicationDetails(applicationId);
     if (app.length === 0) {
@@ -195,7 +186,18 @@ exports.updateApplication = async (req, res) => {
       return res.status(403).json({ success: false, message: "Access denied. Unauthorized access to resource." });
     }
 
-    await Interview.updateApplication(applicationId, status, companyName, role, packageLpa, applicationLink);
+    let company = await Company.findByName(companyName);
+    let companyId;
+    if (company.length === 0) {
+      const result = await Company.create(companyName, packageLpa);
+      companyId = result.insertId;
+    } else {
+      companyId = company[0].company_id;
+      const db = require("../config/db");
+      await db.query("UPDATE Companies SET package_lpa = ? WHERE company_id = ?", [packageLpa || null, companyId]);
+    }
+
+    await Interview.updateApplication(applicationId, status, companyId, role);
 
     if (notes !== undefined) {
       const existingNote = await Interview.getNoteByAppId(applicationId);

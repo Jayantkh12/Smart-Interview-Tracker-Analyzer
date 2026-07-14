@@ -59,25 +59,25 @@ const Interview = {
     );
     return rows;
   },
-  updateApplication: async (applicationId, status, companyName, role, packageLpa, applicationLink) => {
+  updateApplication: async (applicationId, status, companyId, role) => {
     const [result] = await db.query(
       `UPDATE Applications
-       SET status = ?, company_name = ?, role = ?, package_lpa = ?, application_link = ?
+       SET status = ?, company_id = ?, role = ?
        WHERE application_id = ?`,
-      [status, companyName, role, packageLpa || null, applicationLink || null, applicationId]
+      [status, companyId, role, applicationId]
     );
     return result;
   },
   getNoteByAppId: async (applicationId) => {
-    const [rows] = await db.query("SELECT * FROM Notes WHERE application_id = ?", [applicationId]);
+    const [rows] = await db.query("SELECT * FROM ApplicationNotes WHERE application_id = ?", [applicationId]);
     return rows;
   },
   updateNote: async (applicationId, notes) => {
-    const [result] = await db.query("UPDATE Notes SET note_text = ? WHERE application_id = ?", [notes, applicationId]);
+    const [result] = await db.query("UPDATE ApplicationNotes SET note_text = ? WHERE application_id = ?", [notes, applicationId]);
     return result;
   },
   createNote: async (applicationId, notes) => {
-    const [result] = await db.query("INSERT INTO Notes (application_id, note_text) VALUES (?, ?)", [applicationId, notes]);
+    const [result] = await db.query("INSERT INTO ApplicationNotes (application_id, note_text) VALUES (?, ?)", [applicationId, notes]);
     return result;
   },
   deleteApplicationNotes: async (applicationId) => {
@@ -91,6 +91,10 @@ const Interview = {
 
   // Account Cascade Deletes
   deleteAccountCascade: async (userId) => {
+    // Delete child dependencies that do not have ON DELETE CASCADE in SQL schema
+    await db.query(`DELETE f FROM Feedback f JOIN InterviewRounds ir ON f.round_id = ir.round_id JOIN Applications a ON ir.application_id = a.application_id WHERE a.user_id = ?`, [userId]);
+    await db.query(`DELETE ra FROM ResumeAnalysis ra JOIN Resumes r ON ra.resume_id = r.resume_id WHERE r.user_id = ?`, [userId]);
+
     await db.query(`DELETE an FROM ApplicationNotes an JOIN Applications a ON an.application_id = a.application_id WHERE a.user_id = ?`, [userId]);
     await db.query(`DELETE ir FROM InterviewRounds ir JOIN Applications a ON ir.application_id = a.application_id WHERE a.user_id = ?`, [userId]);
     await db.query(`DELETE FROM Applications WHERE user_id = ?`, [userId]);
