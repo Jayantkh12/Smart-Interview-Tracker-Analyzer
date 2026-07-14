@@ -28,8 +28,8 @@ if (process.env.FRONTEND_URL) {
 }
 app.use(cors({
   origin: function (origin, callback) {
-    // Allow requests with no origin (mobile apps, curl, Postman)
-    if (!origin) return callback(null, true);
+    // Allow requests with no origin (mobile apps, curl, Postman) or null origin (local file:// URLs)
+    if (!origin || origin === "null") return callback(null, true);
     if (allowedOrigins.indexOf(origin) !== -1) {
       return callback(null, true);
     }
