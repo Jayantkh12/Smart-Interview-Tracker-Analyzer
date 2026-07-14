@@ -98,7 +98,7 @@ registerForm?.addEventListener("submit", async (e) => {
       showToast("✅ Registration successful! Welcome aboard.", "success");
       
       setTimeout(() => {
-        window.location.href = "./dashboard.html";
+        window.location.href = "./profile.html";
       }, 1200);
     } else {
       showError(data.message || "Registration failed.");
