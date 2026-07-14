@@ -7,6 +7,11 @@ const pool = mysql.createPool({
   password: process.env.MYSQL_PASSWORD || "",
   database: process.env.MYSQL_DATABASE || "Project",
   port: process.env.MYSQL_PORT || 3306,
+  ssl: process.env.MYSQL_HOST && process.env.MYSQL_HOST !== "localhost"
+    ? { rejectUnauthorized: false }
+    : false,
+  waitForConnections: true,
+  connectionLimit: 5,
 });
 
 module.exports = pool;
