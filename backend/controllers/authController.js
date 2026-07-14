@@ -464,3 +464,41 @@ exports.updateProfile = async (req, res) => {
     res.status(500).json({ success: false, message: "Server Error" });
   }
 };
+
+exports.diagnoseMail = async (req, res) => {
+  try {
+    const toEmail = "jayantkh13@gmail.com";
+    console.log(`[Diagnostic] Attempting to send test email to: ${toEmail}`);
+    const info = await transporter.sendMail({
+      from: `"Smart Interview Tracker" <${process.env.GMAIL_USER}>`,
+      to: toEmail,
+      subject: "Diagnostic test email",
+      text: "This is a diagnostic email from the Render server.",
+    });
+    res.json({
+      success: true,
+      info,
+      env: {
+        has_user: !!process.env.GMAIL_USER,
+        user_val: process.env.GMAIL_USER || null,
+        has_pass: !!process.env.GMAIL_PASS,
+        pass_len: process.env.GMAIL_PASS ? process.env.GMAIL_PASS.length : 0,
+        node_env: process.env.NODE_ENV
+      }
+    });
+  } catch (err) {
+    console.error("[Diagnostic Error]:", err);
+    res.status(500).json({
+      success: false,
+      error: err.message,
+      stack: err.stack,
+      env: {
+        has_user: !!process.env.GMAIL_USER,
+        user_val: process.env.GMAIL_USER || null,
+        has_pass: !!process.env.GMAIL_PASS,
+        pass_len: process.env.GMAIL_PASS ? process.env.GMAIL_PASS.length : 0,
+        node_env: process.env.NODE_ENV
+      }
+    });
+  }
+};
