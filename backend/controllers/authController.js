@@ -64,6 +64,8 @@ exports.registerUser = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     await User.createPending(name, phone, email, hashedPassword, otp);
 
+    console.log(`[Registration OTP] Sending code ${otp} to email: ${email}`);
+
     transporter.sendMail({
       from: `"Smart Interview Tracker" <${process.env.GMAIL_USER}>`,
       to: email,
@@ -161,6 +163,8 @@ exports.resendRegisterOTP = async (req, res) => {
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
     await User.createPending(record.name, record.phoneNo, record.email, record.password, otp);
+
+    console.log(`[Resend OTP] Sending code ${otp} to email: ${record.email}`);
 
     transporter.sendMail({
       from: `"Smart Interview Tracker" <${process.env.GMAIL_USER}>`,
