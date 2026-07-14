@@ -60,10 +60,9 @@ exports.registerUser = async (req, res) => {
     }
 
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes TTL
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    await User.createPending(name, phone, email, hashedPassword, otp, expiresAt);
+    await User.createPending(name, phone, email, hashedPassword, otp);
 
     transporter.sendMail({
       from: `"Smart Interview Tracker" <${process.env.GMAIL_USER}>`,
@@ -106,7 +105,7 @@ exports.verifyRegisterOTP = async (req, res) => {
     const record = pending[0];
 
     // Check expiry
-    if (new Date(record.expires_at) < new Date()) {
+    if (record.is_expired) {
       return res.status(400).json({ success: false, message: "Verification code has expired. Please request a new one." });
     }
 
@@ -160,9 +159,8 @@ exports.resendRegisterOTP = async (req, res) => {
 
     const record = pending[0];
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 mins
 
-    await User.createPending(record.name, record.phoneNo, record.email, record.password, otp, expiresAt);
+    await User.createPending(record.name, record.phoneNo, record.email, record.password, otp);
 
     transporter.sendMail({
       from: `"Smart Interview Tracker" <${process.env.GMAIL_USER}>`,

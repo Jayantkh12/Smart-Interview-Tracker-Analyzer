@@ -56,17 +56,20 @@ const User = {
     const [result] = await db.query("UPDATE Users SET profile_photo=? WHERE id=?", [filename, userId]);
     return result;
   },
-  createPending: async (name, phone, email, password, otp, expiresAt) => {
+  createPending: async (name, phone, email, password, otp) => {
     const [result] = await db.query(
       `INSERT INTO pending_users (email, name, phoneNo, password, otp_code, expires_at) 
-       VALUES (?, ?, ?, ?, ?, ?) 
-       ON DUPLICATE KEY UPDATE name=?, phoneNo=?, password=?, otp_code=?, expires_at=?`,
-      [email, name, phone, password, otp, expiresAt, name, phone, password, otp, expiresAt]
+       VALUES (?, ?, ?, ?, ?, DATE_ADD(NOW(), INTERVAL 10 MINUTE)) 
+       ON DUPLICATE KEY UPDATE name=?, phoneNo=?, password=?, otp_code=?, expires_at=DATE_ADD(NOW(), INTERVAL 10 MINUTE)`,
+      [email, name, phone, password, otp, name, phone, password, otp]
     );
     return result;
   },
   findPendingByEmail: async (email) => {
-    const [rows] = await db.query("SELECT * FROM pending_users WHERE email = ?", [email]);
+    const [rows] = await db.query(
+      "SELECT *, (expires_at < NOW()) AS is_expired FROM pending_users WHERE email = ?",
+      [email]
+    );
     return rows;
   },
   deletePendingByEmail: async (email) => {
