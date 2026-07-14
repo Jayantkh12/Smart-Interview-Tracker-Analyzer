@@ -577,8 +577,6 @@ function showToast(message, type = "success") {
   toastTimer = setTimeout(() => toast.classList.remove("show"), 3500);
 }
 
-// Keep old showStatus for backward compat (used by dataService if any)
-function showStatus(msg, type = "success") { showToast(msg, type); }
 
 function escHtml(str) {
   return String(str)
