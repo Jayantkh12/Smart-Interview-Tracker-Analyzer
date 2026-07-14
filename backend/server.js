@@ -62,6 +62,20 @@ app.use(authRoutes);
 app.use(companyRoutes);
 app.use(interviewRoutes);
 
+// Global Error Handler for upload/middleware errors
+app.use((err, req, res, next) => {
+  if (err.name === "MulterError" || err.code === "LIMIT_FILE_SIZE") {
+    const message = err.code === "LIMIT_FILE_SIZE" 
+      ? "File is too large. Maximum size allowed is 5MB." 
+      : err.message;
+    return res.status(400).json({ success: false, message });
+  }
+  if (err) {
+    return res.status(res.statusCode || 400).json({ success: false, message: err.message || "An error occurred." });
+  }
+  next();
+});
+
 const PORT = process.env.PORT || 5500;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

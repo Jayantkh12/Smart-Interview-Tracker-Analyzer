@@ -37,9 +37,10 @@ exports.contactForm = async (req, res) => {
   try {
     const { name, email, subject, message } = req.body;
     await transporter.sendMail({
-      from: email,
+      from: `"Smart Interview Tracker" <${process.env.GMAIL_USER}>`,
+      replyTo: email,
       to: process.env.GMAIL_USER,
-      subject: subject,
+      subject: `[Contact Form] ${subject}`,
       text: `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`,
     });
     res.json({ message: "Message sent successfully" });
@@ -322,7 +323,9 @@ exports.getProfile = async (req, res) => {
       return res.status(404).json({ success: false, message: "User not found." });
     }
 
-    const baseUrl = process.env.BASE_URL || `http://localhost:${process.env.PORT || 5500}`;
+    const host = req.get("host");
+    const protocol = req.secure || req.headers["x-forwarded-proto"] === "https" ? "https" : "http";
+    const baseUrl = process.env.BASE_URL || `${protocol}://${host}`;
 
     res.json({
       success: true,

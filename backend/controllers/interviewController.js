@@ -262,7 +262,9 @@ exports.uploadProfilePhoto = async (req, res) => {
 
     await User.updateProfilePhoto(userId, req.file.filename);
 
-    const baseUrl = process.env.BASE_URL || `http://localhost:${process.env.PORT || 5500}`;
+    const host = req.get("host");
+    const protocol = req.secure || req.headers["x-forwarded-proto"] === "https" ? "https" : "http";
+    const baseUrl = process.env.BASE_URL || `${protocol}://${host}`;
     res.json({
       success: true,
       message: "Profile picture uploaded successfully.",
@@ -290,7 +292,9 @@ exports.uploadResume = async (req, res) => {
 
     await Interview.createResume(userId, title, req.file.filename, today);
 
-    const baseUrl = process.env.BASE_URL || `http://localhost:${process.env.PORT || 5500}`;
+    const host = req.get("host");
+    const protocol = req.secure || req.headers["x-forwarded-proto"] === "https" ? "https" : "http";
+    const baseUrl = process.env.BASE_URL || `${protocol}://${host}`;
     res.json({
       success: true,
       message: "Resume uploaded successfully.",
@@ -312,7 +316,9 @@ exports.getLatestResume = async (req, res) => {
       return res.json({ success: false, message: "No resume found." });
     }
 
-    const baseUrl = process.env.BASE_URL || `http://localhost:${process.env.PORT || 5500}`;
+    const host = req.get("host");
+    const protocol = req.secure || req.headers["x-forwarded-proto"] === "https" ? "https" : "http";
+    const baseUrl = process.env.BASE_URL || `${protocol}://${host}`;
     res.json({
       success: true,
       resumeTitle: rows[0].resume_title,
