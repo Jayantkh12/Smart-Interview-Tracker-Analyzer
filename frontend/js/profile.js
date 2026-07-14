@@ -251,7 +251,8 @@ async function loadResume() {
     const data = await res.json();
 
     if (data.success) {
-      currentResumeUrl = data.resumeUrl;
+      const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+      currentResumeUrl = data.resumeUrl + (token ? `?token=${token}` : "");
       if (resumeFileName) {
         resumeFileName.innerHTML = `<i class="fa-solid fa-file-pdf" style="color:#f87171"></i> ${data.resumeTitle}`;
       }
@@ -287,7 +288,8 @@ resumeInput?.addEventListener("change", async () => {
     const data = await res.json();
 
     if (data.success) {
-      currentResumeUrl = data.resumeUrl;
+      const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+      currentResumeUrl = data.resumeUrl + (token ? `?token=${token}` : "");
       if (resumeFileName) {
         resumeFileName.innerHTML = `<i class="fa-solid fa-file-pdf" style="color:#f87171"></i> ${data.resumeTitle}`;
       }
