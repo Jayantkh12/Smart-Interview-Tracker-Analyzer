@@ -23,7 +23,7 @@
 // and submitting a new interview round to the backend.
 // ============================================================
 
-const BASE = "http://localhost:5500";
+const BASE = API_BASE;
 
 // ── Auth guard ───────────────────────────────────────────────
 const user = JSON.parse(

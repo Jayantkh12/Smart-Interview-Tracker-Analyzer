@@ -20,7 +20,7 @@
 // profile.js – Smart Interview Tracker
 // ============================================================
 
-const API = "http://localhost:5500";
+const API = API_BASE;
 const DEFAULT_IMAGE = "https://cdn-icons-png.flaticon.com/512/847/847969.png";
 
 // ── Auth guard ────────────────────────────────────────────────

@@ -66,7 +66,7 @@ function runStats(data) {
 const statsObserver = new IntersectionObserver((entries) => {
   if (entries[0].isIntersecting && !statsAnimated) {
     statsAnimated = true;
-    fetch("http://localhost:5500/api/dashboard/stats")
+    fetch(`${API_BASE}/api/dashboard/stats`)
       .then((res) => res.json())
       .then((data) => runStats(data))
       .catch(() => {
@@ -124,7 +124,7 @@ contactForm?.addEventListener("submit", async (e) => {
     submitBtn.disabled = true;
     submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending…';
 
-    const response = await fetch("http://localhost:5500/contact", {
+    const response = await fetch(`${API_BASE}/contact`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

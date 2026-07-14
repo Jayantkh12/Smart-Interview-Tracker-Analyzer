@@ -19,12 +19,12 @@
 // ============================================================
 // dashboard.js – Smart Interview Tracker
 // ============================================================
-// Fetches all dashboard data from the backend API at localhost:5500
+// Fetches all dashboard data from the backend API
 // and renders: stats, recent applications, upcoming interviews,
 // resume info, status summary, and question analytics.
 // ============================================================
 
-const BASE = "http://localhost:5500";
+const BASE = API_BASE;
 
 // ── Auth guard ───────────────────────────────────────────────
 const user = JSON.parse(

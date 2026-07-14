@@ -2,7 +2,7 @@
 // login.js – Smart Interview Tracker
 // ============================================================
 
-const API_URL = "http://localhost:5500";
+const API_URL = API_BASE;
 
 // ── Hamburger Menu Toggling ──────────────────────────────────
 const menuBtn  = document.getElementById("menuBtn");

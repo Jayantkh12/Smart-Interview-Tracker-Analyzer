@@ -20,7 +20,7 @@
 // applications.js – Smart Interview Tracker
 // ============================================================
 
-const BASE = "http://localhost:5500";
+const BASE = API_BASE;
 const user = JSON.parse(
   localStorage.getItem("user") || sessionStorage.getItem("user"),
 );

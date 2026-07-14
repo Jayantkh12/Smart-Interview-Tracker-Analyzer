@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: smart-interview-tracker-api
+    runtime: node
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: NODE_ENV
+        value: production
+      # Add the following in the Render Dashboard → Environment tab:
+      # MYSQL_HOST      = your-aiven-host
+      # MYSQL_USER      = your-db-user
+      # MYSQL_PASSWORD  = your-db-password
+      # MYSQL_DATABASE  = smart_interview_tracker
+      # MYSQL_PORT      = 3306
+      # JWT_SECRET      = your-strong-random-secret
+      # GMAIL_USER      = jayantkh12@gmail.com
+      # GMAIL_PASS      = your-gmail-app-password
+      # FRONTEND_URL    = https://your-app.vercel.app
+      # BASE_URL        = https://smart-interview-tracker-api.onrender.com

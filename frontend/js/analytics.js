@@ -19,11 +19,11 @@
 // ============================================================
 // analytics.js – Smart Interview Tracker & Analyzer
 // ============================================================
-// Fetches data from the backend API (http://localhost:5500)
+// Fetches data from the backend API
 // and renders all analytics sections including Chart.js charts.
 // ============================================================
 
-const BASE = "http://localhost:5500";
+const BASE = API_BASE;
 
 // ── Auth guard ──────────────────────────────────────────────
 const user = JSON.parse(
