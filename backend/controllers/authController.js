@@ -1,19 +1,66 @@
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
-const nodemailer = require("nodemailer");
 const jwt = require("jsonwebtoken");
+const https = require("https");
 
+function sendEmail({ to, replyTo, subject, text, html }) {
+  return new Promise((resolve, reject) => {
+    const senderEmail = process.env.BREVO_SENDER_EMAIL || process.env.GMAIL_USER;
+    if (!senderEmail) {
+      return reject(new Error("BREVO_SENDER_EMAIL or GMAIL_USER is required to send emails."));
+    }
 
-// mail auth
-const transporter = nodemailer.createTransport({
-  pool: true,
-  service: "gmail",
-  auth: {
-    user: process.env.GMAIL_USER,
-    pass: process.env.GMAIL_PASS ? process.env.GMAIL_PASS.replace(/\s+/g, "") : "",
-  },
-});
+    const data = JSON.stringify({
+      sender: {
+        name: "Smart Interview Tracker",
+        email: senderEmail,
+      },
+      to: [{ email: to }],
+      replyTo: replyTo ? { email: replyTo } : undefined,
+      subject,
+      textContent: text,
+      htmlContent: html,
+    });
+
+    const apiKey = process.env.BREVO_API_KEY;
+    if (!apiKey) {
+      return reject(new Error("BREVO_API_KEY environment variable is not defined."));
+    }
+
+    const options = {
+      hostname: "api.brevo.com",
+      port: 443,
+      path: "/v3/smtp/email",
+      method: "POST",
+      headers: {
+        "api-key": apiKey,
+        "Content-Type": "application/json",
+        "Content-Length": Buffer.byteLength(data),
+      },
+    };
+
+    const req = https.request(options, (res) => {
+      let body = "";
+      res.on("data", (chunk) => body += chunk);
+      res.on("end", () => {
+        if (res.statusCode >= 200 && res.statusCode < 300) {
+          try {
+            resolve(JSON.parse(body));
+          } catch (e) {
+            resolve(body);
+          }
+        } else {
+          reject(new Error(`Brevo API error (Status ${res.statusCode}): ${body}`));
+        }
+      });
+    });
+
+    req.on("error", (err) => reject(err));
+    req.write(data);
+    req.end();
+  });
+}
 
 const passwordResetCodes = new Map();
 const RESET_CODE_TTL_MS = 10 * 60 * 1000;
@@ -37,10 +84,9 @@ function getPasswordResetEmail(code) {
 exports.contactForm = async (req, res) => {
   try {
     const { name, email, subject, message } = req.body;
-    await transporter.sendMail({
-      from: `"Smart Interview Tracker" <${process.env.GMAIL_USER}>`,
+    await sendEmail({
       replyTo: email,
-      to: process.env.GMAIL_USER,
+      to: process.env.BREVO_SENDER_EMAIL || process.env.GMAIL_USER,
       subject: `[Contact Form] ${subject}`,
       text: `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`,
     });
@@ -67,8 +113,7 @@ exports.registerUser = async (req, res) => {
 
     console.log(`[Registration OTP] Sending code ${otp} to email: ${email}`);
 
-    transporter.sendMail({
-      from: `"Smart Interview Tracker" <${process.env.GMAIL_USER}>`,
+    sendEmail({
       to: email,
       subject: "Verify your email for InterviewTracker",
       text: `Your email verification code is ${otp}. It expires in 10 minutes.`,
@@ -80,7 +125,7 @@ exports.registerUser = async (req, res) => {
           <p style="font-size:13px;color:#64748b;margin-bottom:0">This code expires in 10 minutes. If you did not request this, you can ignore this email.</p>
         </div>
       `,
-    }).catch(err => console.error("SMTP registration email error:", err));
+    }).catch(err => console.error("Brevo registration email error:", err));
 
     res.json({
       success: true,
@@ -167,8 +212,7 @@ exports.resendRegisterOTP = async (req, res) => {
 
     console.log(`[Resend OTP] Sending code ${otp} to email: ${record.email}`);
 
-    transporter.sendMail({
-      from: `"Smart Interview Tracker" <${process.env.GMAIL_USER}>`,
+    sendEmail({
       to: record.email,
       subject: "New verification code for InterviewTracker",
       text: `Your new email verification code is ${otp}. It expires in 10 minutes.`,
@@ -180,7 +224,7 @@ exports.resendRegisterOTP = async (req, res) => {
           <p style="font-size:13px;color:#64748b;margin-bottom:0">This code expires in 10 minutes. If you did not request this, you can ignore this email.</p>
         </div>
       `,
-    }).catch(err => console.error("SMTP resend email error:", err));
+    }).catch(err => console.error("Brevo resend email error:", err));
 
     res.json({
       success: true,
@@ -264,14 +308,15 @@ exports.forgotPassword = async (req, res) => {
 
     const code = crypto.randomInt(100000, 1000000).toString();
     const codeHash = await bcrypt.hash(code, 10);
-    const isMailConfigured = Boolean(process.env.GMAIL_USER && process.env.GMAIL_PASS);
-
+    const isMailConfigured = Boolean(process.env.BREVO_API_KEY);
+ 
     if (isMailConfigured) {
       const resetEmail = getPasswordResetEmail(code);
-      await transporter.sendMail({
-        from: process.env.GMAIL_USER,
+      await sendEmail({
         to: email,
-        ...resetEmail,
+        subject: resetEmail.subject,
+        text: resetEmail.text,
+        html: resetEmail.html,
       });
     } else if (process.env.NODE_ENV === "production") {
       throw new Error("Password reset email is not configured.");
