@@ -248,28 +248,14 @@ exports.uploadProfilePhoto = async (req, res) => {
     }
 
     const User = require("../models/User");
-    const uploadDir = path.join(__dirname, "..", "uploads", "profile");
-    
-    // Get previous image
-    const rows = await User.getProfile(userId);
-    if (
-      rows.length &&
-      rows[0].profile_photo &&
-      fs.existsSync(path.join(uploadDir, rows[0].profile_photo))
-    ) {
-      fs.unlinkSync(path.join(uploadDir, rows[0].profile_photo));
-    }
+    const base64Data = `data:${req.file.mimetype};base64,${req.file.buffer.toString("base64")}`;
 
-    await User.updateProfilePhoto(userId, req.file.filename);
+    await User.updateProfilePhoto(userId, base64Data);
 
-    const host = req.get("host");
-    const protocol = req.secure || req.headers["x-forwarded-proto"] === "https" ? "https" : "http";
-    const baseUrl = process.env.BASE_URL || `${protocol}://${host}`;
     res.json({
       success: true,
       message: "Profile picture uploaded successfully.",
-      filename: req.file.filename,
-      imageUrl: `${baseUrl}/uploads/profile/${req.file.filename}`,
+      imageUrl: base64Data,
     });
   } catch (err) {
     console.error(err);
@@ -289,17 +275,19 @@ exports.uploadResume = async (req, res) => {
 
     const title = resumeTitle || req.file.originalname;
     const today = new Date().toISOString().slice(0, 10);
+    const base64Data = `data:${req.file.mimetype};base64,${req.file.buffer.toString("base64")}`;
 
-    await Interview.createResume(userId, title, req.file.filename, today);
+    await Interview.createResume(userId, title, base64Data, today);
 
     const host = req.get("host");
     const protocol = req.secure || req.headers["x-forwarded-proto"] === "https" ? "https" : "http";
     const baseUrl = process.env.BASE_URL || `${protocol}://${host}`;
+
     res.json({
       success: true,
       message: "Resume uploaded successfully.",
       resumeTitle: title,
-      resumeUrl: `${baseUrl}/uploads/resumes/${req.file.filename}`,
+      resumeUrl: `${baseUrl}/api/resume/download/${userId}`,
     });
   } catch (err) {
     console.error(err);
@@ -319,15 +307,53 @@ exports.getLatestResume = async (req, res) => {
     const host = req.get("host");
     const protocol = req.secure || req.headers["x-forwarded-proto"] === "https" ? "https" : "http";
     const baseUrl = process.env.BASE_URL || `${protocol}://${host}`;
+    const downloadUrl = `${baseUrl}/api/resume/download/${userId}`;
+
     res.json({
       success: true,
       resumeTitle: rows[0].resume_title,
-      resumeUrl: `${baseUrl}/uploads/resumes/${rows[0].resume_file}`,
+      resumeUrl: downloadUrl,
       uploadDate: rows[0].upload_date,
     });
   } catch (err) {
     console.error(err);
     res.status(500).json({ success: false, message: "Server Error" });
+  }
+};
+
+exports.downloadResume = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const rows = await Interview.getLatestResume(userId);
+
+    if (rows.length === 0) {
+      return res.status(404).send("No resume found for this user.");
+    }
+
+    const resumeData = rows[0].resume_file;
+    const matches = resumeData.match(/^data:(.+);base64,(.+)$/);
+
+    if (matches) {
+      const mimeType = matches[1];
+      const base64String = matches[2];
+      const buffer = Buffer.from(base64String, "base64");
+
+      res.setHeader("Content-Type", mimeType);
+      res.setHeader("Content-Disposition", `inline; filename="${rows[0].resume_title}"`);
+      res.send(buffer);
+    } else {
+      // Legacy filesystem fallback
+      const uploadDir = path.join(__dirname, "..", "uploads", "resumes");
+      const filePath = path.join(uploadDir, resumeData);
+      if (fs.existsSync(filePath)) {
+        res.download(filePath, rows[0].resume_title);
+      } else {
+        res.status(404).send("Resume file not found on server.");
+      }
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Server Error");
   }
 };
 

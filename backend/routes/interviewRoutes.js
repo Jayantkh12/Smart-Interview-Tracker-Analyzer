@@ -5,65 +5,35 @@ const path = require("path");
 const fs = require("fs");
 const interviewController = require("../controllers/interviewController");
 
-// Multer disk storage and upload config for user profile images
-const profileUploadDir = path.join(__dirname, "..", "uploads", "profile");
-if (!fs.existsSync(profileUploadDir)) {
-  fs.mkdirSync(profileUploadDir, { recursive: true });
-}
-
-const profileStorage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, profileUploadDir),
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    cb(null, "user_" + Date.now() + "_" + Math.floor(Math.random() * 10000) + ext);
-  },
-});
-
-const profileFilter = (req, file, cb) => {
-  const allowed = ["image/jpeg", "image/jpg", "image/png"];
-  if (allowed.includes(file.mimetype)) {
-    cb(null, true);
-  } else {
-    cb(new Error("Only JPG, JPEG and PNG images are allowed."));
-  }
-};
-
+// Multer memory storage and upload config for user profile images
 const uploadProfile = multer({
-  storage: profileStorage,
-  fileFilter: profileFilter,
+  storage: multer.memoryStorage(),
+  fileFilter: (req, file, cb) => {
+    const allowed = ["image/jpeg", "image/jpg", "image/png"];
+    if (allowed.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error("Only JPG, JPEG and PNG images are allowed."));
+    }
+  },
   limits: { fileSize: 5 * 1024 * 1024 },
 });
 
-// Multer disk storage and upload config for resumes
-const resumeUploadDir = path.join(__dirname, "..", "uploads", "resumes");
-if (!fs.existsSync(resumeUploadDir)) {
-  fs.mkdirSync(resumeUploadDir, { recursive: true });
-}
-
-const resumeStorage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, resumeUploadDir),
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    cb(null, "resume_" + Date.now() + "_" + Math.floor(Math.random() * 10000) + ext);
-  },
-});
-
-const resumeFilter = (req, file, cb) => {
-  const allowed = [
-    "application/pdf",
-    "application/msword",
-    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-  ];
-  if (allowed.includes(file.mimetype)) {
-    cb(null, true);
-  } else {
-    cb(new Error("Only PDF, DOC and DOCX files are allowed."));
-  }
-};
-
+// Multer memory storage and upload config for resumes
 const uploadResume = multer({
-  storage: resumeStorage,
-  fileFilter: resumeFilter,
+  storage: multer.memoryStorage(),
+  fileFilter: (req, file, cb) => {
+    const allowed = [
+      "application/pdf",
+      "application/msword",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    ];
+    if (allowed.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error("Only PDF, DOC and DOCX files are allowed."));
+    }
+  },
   limits: { fileSize: 5 * 1024 * 1024 },
 });
 
@@ -89,6 +59,7 @@ router.delete("/api/application/:applicationId", verifyToken, interviewControlle
 router.post("/api/profile/upload", verifyToken, uploadProfile.single("profile"), interviewController.uploadProfilePhoto);
 router.post("/api/resume/upload", verifyToken, uploadResume.single("resume"), interviewController.uploadResume);
 router.get("/api/resume/:userId", verifyToken, validateUser, interviewController.getLatestResume);
+router.get("/api/resume/download/:userId", verifyToken, validateUser, interviewController.downloadResume);
 
 // Analytics
 router.get("/api/analytics/stats/:userId", verifyToken, validateUser, interviewController.getAnalyticsStats);

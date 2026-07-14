@@ -340,7 +340,9 @@ exports.getProfile = async (req, res) => {
       preferredLocation: rows[0].preferred_location || "",
       workType: rows[0].work_type || "",
       profilePic: rows[0].profile_photo
-        ? `${baseUrl}/uploads/profile/${rows[0].profile_photo}`
+        ? (rows[0].profile_photo.startsWith("data:") || rows[0].profile_photo.startsWith("http")
+            ? rows[0].profile_photo
+            : `${baseUrl}/uploads/profile/${rows[0].profile_photo}`)
         : null,
     });
   } catch (err) {
