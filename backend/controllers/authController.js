@@ -464,3 +464,17 @@ exports.updateProfile = async (req, res) => {
     res.status(500).json({ success: false, message: "Server Error" });
   }
 };
+
+exports.diagnoseMail = async (req, res) => {
+  try {
+    res.json({
+      has_user: !!process.env.GMAIL_USER,
+      user_val: process.env.GMAIL_USER || null,
+      has_pass: !!process.env.GMAIL_PASS,
+      pass_len: process.env.GMAIL_PASS ? process.env.GMAIL_PASS.length : 0,
+      node_env: process.env.NODE_ENV
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
